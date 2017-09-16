@@ -3,7 +3,7 @@ jobs:
   include:
     - stage: compile
     - stage: test
-      script: skip
+      script: "mvn cobertura:cobertura"
     - stage: deploy
 stages:
   - compile
