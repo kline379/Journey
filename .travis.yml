@@ -11,7 +11,7 @@ stages:
   - name: deploy
     if: branch = master
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -t 13666b82-88bc-4b61-a46c-e84739214b20
 deploy:
   provider: cloudfoundry
   api: https://api.ng.bluemix.net
