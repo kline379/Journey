@@ -1,4 +1,10 @@
 language: java
+jobs:
+  include:
+    - stage: compile
+    - stage: test
+      script: skip
+    - stage: deploy
 stages:
   - compile
   - test
