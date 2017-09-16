@@ -1,4 +1,9 @@
 language: java
+stages:
+  - compile
+  - test
+  - name: deploy
+    if: branch = master
 deploy:
   provider: cloudfoundry
   api: https://api.ng.bluemix.net
