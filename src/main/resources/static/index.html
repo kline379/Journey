@@ -29,14 +29,10 @@
     <div class="location-search-container">
         <div class="input-group custom-search-form">
             <h2 class ="logo" >Super Journey!</h2>
-            <input type="text" class="form-control" placeholder="Tell me where you want to go">
-            <span class="input-group-btn">
-                <a class='nostyle' href='./greeting'>
-                        <button class="btn btn-default" type="button">
-                                <span class="glyphicon glyphicon-search"><img src="http://worldartsme.com/images/search-button-clipart-1.jpg" width="18px"/></span>
-                        </button>
-                </a>
-                     </span>
+            <form action="./greeting">
+                <input type="text" class="form-control" placeholder="Tell me where you want to go" name="searchQuery">
+                <input type="submit" class="glyphicon glyphicon-search">
+            </form>
         </div><!-- /input-group -->
     </div>
 </header>
