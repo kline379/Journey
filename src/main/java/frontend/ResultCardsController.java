@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.ArrayList;
+import java.io.*;
 
 @Controller
 public class ResultCardsController {
 
   @RequestMapping("/results")
-  public String populateCards(@RequestParam(value="searchQuery", required=true, defaultValue="World") String query, Model model) {
+  public String populateCards(
+      @RequestParam(value = "searchQuery", required = true, defaultValue = "World") String query, Model model) {
 
     List<Card> results = process(query);
     model.addAttribute("results", results);
@@ -19,6 +21,46 @@ public class ResultCardsController {
   }
 
   private List<Card> process(String query) {
+    try {
+      ProcessBuilder ps = new ProcessBuilder(
+        "python",
+        "src\\main\\java\\frontend\\query.py"
+      );
+
+      ps.redirectErrorStream(true);
+      Process p = ps.start();
+
+      List<Card> cards = new ArrayList<Card>();
+
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
+
+      writer.write(query + "\n");
+      writer.flush();
+
+      try (BufferedReader oR = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
+        String s = oR.readLine();
+
+        while (s != null) {
+          String title = s;
+          StringBuilder body = new StringBuilder();
+          s = oR.readLine();
+
+          while (!s.equals("###")) {
+            body.append(s);
+            s = oR.readLine();
+          }
+
+          cards.add(new Card(title, body.toString()));
+          s = oR.readLine();
+        }
+      }
+      p.waitFor();
+      return cards;
+    } catch (Throwable e) {
+      return new ArrayList<Card>();
+    }
+
+    /*
     List<Card> cards = new ArrayList<Card>();
     Card zero = new Card(query, "This should be here too");
     Card one = new Card("Myrtle Beach, SC", "One beach");
@@ -31,5 +73,6 @@ public class ResultCardsController {
     cards.add(three);
     cards.add(four);
     return cards;
+    */
   }
 }
