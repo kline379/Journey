@@ -12,3 +12,4 @@ deploy:
   space: cse5914
   on:
     repo: kline379/Journey
+    branch: **
