@@ -22,6 +22,12 @@ public class ResultCardsController {
 
   private List<Card> process(String query) {
     try {
+      ProcessBuilder pips = new ProcessBuilder(
+        "pip3.6 install --upgrade watson-developer-cloud"
+      );
+      Process pip = pips.start();
+      pip.waitFor();
+
       ProcessBuilder ps = new ProcessBuilder(
         "python3.6",
         "src/main/java/frontend/query.py"
@@ -57,7 +63,9 @@ public class ResultCardsController {
       p.waitFor();
       return cards;
     } catch (Throwable e) {
-      return new ArrayList<Card>();
+      List<Card> cards = new ArrayList<Card>();
+      cards.add(new Card("Error", e.toString()));
+      return cards;
     }
 
     /*
