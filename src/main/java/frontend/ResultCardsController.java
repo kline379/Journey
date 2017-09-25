@@ -10,7 +10,7 @@ import java.util.ArrayList;
 @Controller
 public class ResultCardsController {
 
-  @RequestMapping("/test")
+  @RequestMapping("/results")
   public String populateCards(@RequestParam(value="searchQuery", required=true, defaultValue="World") String query, Model model) {
 
     List<Card> results = process(query);
