@@ -23,13 +23,13 @@ public class ResultCardsController {
   private List<Card> process(String query) {
     try {
       ProcessBuilder pips = new ProcessBuilder(
-        "pip3.6 install --upgrade watson-developer-cloud"
+        "pip install --upgrade watson-developer-cloud"
       );
       Process pip = pips.start();
       pip.waitFor();
 
       ProcessBuilder ps = new ProcessBuilder(
-        "python3.6",
+        "python",
         "src/main/java/frontend/query.py"
       );
 
