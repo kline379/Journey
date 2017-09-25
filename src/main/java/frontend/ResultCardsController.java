@@ -22,11 +22,6 @@ public class ResultCardsController {
 
   private List<Card> process(String query) {
     try {
-      ProcessBuilder pips = new ProcessBuilder(
-        "pip install --upgrade watson-developer-cloud"
-      );
-      Process pip = pips.start();
-      pip.waitFor();
 
       ProcessBuilder ps = new ProcessBuilder(
         "python",
