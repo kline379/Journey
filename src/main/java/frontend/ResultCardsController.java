@@ -23,8 +23,8 @@ public class ResultCardsController {
   private List<Card> process(String query) {
     try {
       ProcessBuilder ps = new ProcessBuilder(
-        "python",
-        "src\\main\\java\\frontend\\query.py"
+        "python3.6",
+        "src/main/java/frontend/query.py"
       );
 
       ps.redirectErrorStream(true);
