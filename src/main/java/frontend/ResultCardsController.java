@@ -29,8 +29,9 @@ public class ResultCardsController {
 	  QueryRetriever retriever = new QueryRetriever();
 	  SolrDocumentList documents = retriever.RetrieveQueries(query);
 	  for(int i = 0; i < documents.size(); i++) {
-		  String title = documents.get(i).getFieldValue("title").toString();
-		  cardList.add(new Card(title, ""));
+      String title = documents.get(i).getFieldValue("title").toString();
+      String body = documents.get(i).getFieldValues("body").toString();
+		  cardList.add(new Card(title, body));
 	  }
 	  
 	  return cardList;
