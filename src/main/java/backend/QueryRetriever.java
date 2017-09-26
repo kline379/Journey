@@ -23,7 +23,7 @@ import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrCluster.Sta
  */
 public class QueryRetriever 
 {    
-    public SolrDocumentList RetrieveQueries() throws InterruptedException, SolrServerException, IOException{
+    public SolrDocumentList RetrieveQueries(String query) throws InterruptedException, SolrServerException, IOException{
     	
     	final String USERNAME = "638bd9ff-2179-469b-93ad-7ca894776fdd";
     	final String PASSWORD = "8slDdIXgCKjd";
@@ -45,9 +45,9 @@ public class QueryRetriever
     	// Make a query
     	String endPoint = "https://gateway.watsonplatform.net/retrieve-and-rank/api";
     	HttpSolrClient solrClient = new HttpSolrClient(service.getSolrUrl(cluster.getId()),
-    	        HttpSolrClientUtils.createHttpClient(endPoint, USERNAME, PASSWORD));
-    	SolrQuery query = new SolrQuery("beach and race track");
-    	QueryResponse response = solrClient.query("Wiki_Travel", query);
+							HttpSolrClientUtils.createHttpClient(endPoint, USERNAME, PASSWORD));
+    	SolrQuery solrQuery = new SolrQuery(query);
+    	QueryResponse response = solrClient.query("Wiki_Travel", solrQuery);
     	
     	return response.getResults(); //.get(0).getFieldValue("title"));
     	
