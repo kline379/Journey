@@ -5,14 +5,23 @@ import json
 import pysolr
 import multiprocessing as mp
 import unicodedata
+from json2html import *
 from time import sleep
+import json
 from watson_developer_cloud import RetrieveAndRankV1
+from watson_developer_cloud import NaturalLanguageUnderstandingV1
+import watson_developer_cloud.natural_language_understanding.features.v1 \
+  as Features
 
 base_path = R"bydoc\\"
 xmlPath = R"wikitravel-en-20090302.xml"
+
 url_s = R"https://gateway.watsonplatform.net/retrieve-and-rank/api"
-username_s = "638bd9ff-2179-469b-93ad-7ca894776fdd"
-password_s = "8slDdIXgCKjd"
+username_rar = "638bd9ff-2179-469b-93ad-7ca894776fdd"
+password_rar = "8slDdIXgCKjd"
+
+username_nlu = "0d758ea1-3d20-42f1-8140-75233955f6e5"
+password_nlu = "Eozo4ibLtjVF"
 
 def make_cluster(retrieve_and_rank):  
     
@@ -42,7 +51,7 @@ def add_documents(
         if count % 1000:
             sleep(10)
             retrieve_and_rank = RetrieveAndRankV1(        
-                username=username_s, password=password_s)
+                username=username_rar, password=password_rar)
         else:
             sleep(0.1)
 
@@ -125,19 +134,40 @@ import sys
 if __name__ == '__main__':    
 
     rar = RetrieveAndRankV1(        
-        username=username_s, password=password_s)
+        username=username_rar, password=password_rar)
     cluster_id = rar.list_solr_clusters()["clusters"][0]["solr_cluster_id"]
 
     client = rar.get_pysolr_client(cluster_id, "Wiki_Travel")
     solr_results = client.search(sys.stdin.readline())
-       
+
+    nlu = NaturalLanguageUnderstandingV1(
+        username=username_nlu, password=password_nlu,
+        version="2017-02-27")
+
+    ct = 0
     for r in solr_results:
-        print(r["title"])
-        text = r["body"]
-        text = text.encode('ascii', 'ignore')
-        text = text.decode('ascii')
-        print(text)
-        print("###")
+        if ct != 0: break
+        ct = ct + 1
+        title = r["title"]
+        body = r["body"]
+        body = body.encode('ascii', 'ignore')
+        body = body.decode('ascii')
+
+        nlu_r = nlu.analyze(
+            text=body,
+            features=[
+                Features.Concepts(),
+                Features.Categories(),
+                Features.Keywords(),
+                Features.Relations(),
+                Features.Entities(),
+                Features.SemanticRoles()
+            ]
+        )
+        print(json.dumps(nlu_r))
+        
+        #html = json2html.convert(json=nlu_r)
+        #print(html)
 
 '''
     docs = parse_travel(xmlPath)
@@ -150,7 +180,7 @@ if __name__ == '__main__':
 
  
     rar = RetrieveAndRankV1(        
-        username=username_s, password=password_s)
+        username=username_rar, password=password_rar)
     cluster_id = rar.list_solr_clusters()["clusters"][0]["solr_cluster_id"]
     collection_name = "Wiki_Travel"
     add_documents(rar, cluster_id, collection_name, docs)
