@@ -38,7 +38,9 @@ def parse_travel(xml_path):
 
     cpu_ct = mp.cpu_count()
     pool = mp.Pool(cpu_ct)
-    return pool.map(parse_docs, elements)
+    rtn = pool.map(parse_docs, elements)
+    pool.terminate()
+    return rtn
 
 def process_el(doc, dir):
     id = doc["id"]
