@@ -142,6 +142,9 @@ if __name__ == '__main__':
             cat = dat['category']
             training_data = training_data + '"' + s + '",' + cat + '\n'
 
+    print("Generated: " + str(len(training_data.split('\n'))) + " entries")
+    print()
+
     nlc = NaturalLanguageClassifierV1(username=username_nlc,
         password=password_nlc)
 
