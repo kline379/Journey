@@ -5,21 +5,32 @@ import json
 username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"
 password_nlc = "a2gbUnUVx78B"
 
-# Old classifier
-#classifer_id = 'bbb1c7x227-nlc-29075'
-classifer_id = 'bbab2cx226-nlc-29393'
-
 if __name__ == '__main__':
     nlc = NaturalLanguageClassifierV1(username=username_nlc,
         password = password_nlc)
+    
+    classifiers = nlc.list()
+    classifier_ids = { }
+    print("Available classifiers:")
+    for c in classifiers['classifiers']:
+        name = c['name']
+        c_id = c['classifier_id']
+        classifier_ids[name] = c_id
+        status = nlc.status(c_id)['status']
+        print('{}: {}'.format(name, status))
+
+    print("\nWrite desired classifier:")
+    classifier_name = sys.stdin.readline().rstrip()
+    classifer_id = classifier_ids[classifier_name]
     status = nlc.status(classifer_id)
+
     if status['status'] != 'Available':
         print("Classifier is not avaiable")
         sys.exit(0)
 
     while True:
         print("Write query: ")
-        line = sys.stdin.readline()
+        line = sys.stdin.readline().rstrip()
         if line == 'quit' or line == 'q()':
             sys.exit(1)
 		
