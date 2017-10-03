@@ -86,8 +86,8 @@ def GetArticleCategories(article):
         lvls = c["label"].split('/')[1:]
         cur = ''
         for l in lvls:
-            cur = cur + '/' + l
-            rtn.append(cur)
+            cur = cur + l + '/'            
+            rtn.append(cur[:-1])
     return rtn 
 
 def GetRelationTypes(articles):
@@ -95,15 +95,12 @@ def GetRelationTypes(articles):
     for a in articles:
         rels = a.get_file_type(RELATIONS)
         cats = GetArticleCategories(a)
-        cat = ''
-        if(len(cats) > 0):
-            cat = cats[1]
         for r in rels:            
             rel = {
                 'type' : r['type'],
                 'sentence' : r['sentence'],
                 'score' : float(r['score']),
-                'category' : cat
+                'category' : cats
             }
             if rel['type'] not in types:
                 types[rel['type']] = []
@@ -132,15 +129,17 @@ if __name__ == '__main__':
     types = GetRelationTypes(articles)    
     for k in types:
         types[k] = sorted(types[k], key=lambda x: -x['score'])
-        types[k] = types[k][:100]
+        types[k] = types[k][:600]
 
     training_data = ''
     for k, v in types.items():
         for dat in v:
             s = dat['sentence']
             s = s.replace('"', '""')
-            cat = dat['category']
-            training_data = training_data + '"' + s + '",' + cat + '\n'
+            cat = ','.join(x for x in dat['category'])
+            nextEntry = '"' + s + '",' + cat + '\n'
+            if(len(nextEntry) < 1024):
+                training_data = training_data + nextEntry
 
     print("Generated: " + str(len(training_data.split('\n'))) + " entries")
     print()
@@ -150,8 +149,9 @@ if __name__ == '__main__':
 
     classifer = nlc.create(
         training_data=training_data,
-        name='C1',
+        name='C2',
         language='en'
     )
 
     print(json.dumps(classifer, indent=2))
+    

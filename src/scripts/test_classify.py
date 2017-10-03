@@ -4,7 +4,10 @@ import json
 
 username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"
 password_nlc = "a2gbUnUVx78B"
-classifer_id = 'bbb1c7x227-nlc-29075'
+
+# Old classifier
+#classifer_id = 'bbb1c7x227-nlc-29075'
+classifer_id = 'bbab2cx226-nlc-29393'
 
 if __name__ == '__main__':
     nlc = NaturalLanguageClassifierV1(username=username_nlc,
