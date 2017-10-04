@@ -108,12 +108,21 @@ def GetRelationTypes(articles):
 
     return types
 
-def GetCategories(articles):
-    set_cats = set()
+def GetCategoryCounts(articles):
+    cats_dict = []
     for a in articles:
         cats = GetArticleCategories(a)
         for c in cats:
-            set_cats.add(c)
+            if c not in cats_dict:
+                cats_dict[c] = 0
+            cats_dict[c] = cats_dict[c] + 1
+    return cats_dict
+
+def GetCategories(articles):
+    cats = GetCategoryCounts(articles)
+    set_cats = set()
+    for k in cats:
+        set_cats.add(k)
     return set_cats
 
 '''
@@ -127,6 +136,13 @@ password_nlc = "a2gbUnUVx78B"
 if __name__ == '__main__':
     articles = LoadArticles(file_directory)  
     types = GetRelationTypes(articles)    
+    type_cts = GetCategoryCounts(articles)
+    sorted_cts = [(k, type_cts[k]) for k in sorted(type_cts, key=k.get)][:100]
+    for k in sorted_cts:
+        print(k)
+
+
+'''
     for k in types:
         types[k] = sorted(types[k], key=lambda x: -x['score'])
         types[k] = types[k][:600]
@@ -154,4 +170,4 @@ if __name__ == '__main__':
     )
 
     print(json.dumps(classifer, indent=2))
-    
+'''
