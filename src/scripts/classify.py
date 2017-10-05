@@ -101,7 +101,7 @@ def GetRelationTypes(articles):
                 'type' : r['type'],
                 'sentence' : r['sentence'],
                 'score' : float(r['score']),
-                'categories' : cats
+                'category' : cats[-1] if len(cats) > 0 else ''
             }
             if rel['type'] not in types:
                 types[rel['type']] = []
@@ -135,6 +135,12 @@ username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"
 password_nlc = "a2gbUnUVx78B"
 
 if __name__ == '__main__':
+    print("Write classifier name:")
+    classifierName = sys.stdin.readline().rstrip()
+
+    print("Write top number of entries:")
+    numEntries = int(sys.stdin.readline().rstrip())
+
     articles = LoadArticles(file_directory)  
 
     type_cts = GetCategoryCounts(articles)
@@ -145,27 +151,23 @@ if __name__ == '__main__':
     
     types = GetRelationTypes(articles)    
 
-    for k in types:
-        for i in range(0, len(types[k])):
-            types[k][i]['categories'] = [c          \
-                for c in types[k][i]['categories']  \
-                if c in filtered_types]
+    for k in types:        
+        types[k] = [c for c in types[k] if \
+            c['category'] in filtered_types]
 
         types[k] = sorted(types[k], key=lambda x: -x['score'])
-        types[k] = types[k][:600]
+        types[k] = types[k][:numEntries]
 
     training_data = ''
     for k, v in types.items():
         for dat in v:
             s = dat['sentence']
             s = s.replace('"', '""')
-            cat = ','.join(x for x in dat['categories'])
+            cat = dat['category']
             nextEntry = '"' + s + '",' + cat + '\n'
             if(len(nextEntry) < 1024):
                 training_data = training_data + nextEntry
-'''
-    print(training_data)
-'''
+
     print("Generated: " + str(len(training_data.split('\n'))) + " entries")
     print()
 
@@ -174,7 +176,7 @@ if __name__ == '__main__':
 
     classifer = nlc.create(
         training_data=training_data,
-        name='C2',
+        name=classifierName,
         language='en'
     )
 
