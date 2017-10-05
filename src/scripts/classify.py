@@ -8,6 +8,7 @@ import multiprocessing as mp
 from json2html import *
 from watson_developer_cloud import NaturalLanguageClassifierV1
 import sys
+import os
 
 def is_int(s):
     try:
@@ -159,14 +160,32 @@ if __name__ == '__main__':
         types[k] = types[k][:numEntries]
 
     training_data = ''
+    ranking_data = {}
     for k, v in types.items():
         for dat in v:
             s = dat['sentence']
             s = s.replace('"', '""')
             cat = dat['category']
+            score_of_1000 = int(dat['score']*1000)
+
             nextEntry = '"' + s + '",' + cat + '\n'
             if(len(nextEntry) < 1024):
                 training_data = training_data + nextEntry
+
+            if cat not in ranking_data:
+                ranking_data[cat] = ''
+
+            nextEntryRanker = '"' + s + '",' + str(score_of_1000) + \
+                ',' + cat + "\n"
+    
+            ranking_data[cat] = ranking_data[cat] + nextEntryRanker
+
+    for k, v in ranking_data.items():
+        k = k.replace(' ', '').replace('/', '_')
+        with open(os.path.join(k + ".csv"), 'w') as file:
+            file.write(v)
+
+    '''
 
     print("Generated: " + str(len(training_data.split('\n'))) + " entries")
     print()
@@ -181,3 +200,4 @@ if __name__ == '__main__':
     )
 
     print(json.dumps(classifer, indent=2))
+'''
