@@ -7,6 +7,7 @@ import json
 import multiprocessing as mp
 from json2html import *
 from watson_developer_cloud import NaturalLanguageClassifierV1
+from watson_developer_cloud import RetrieveAndRankV1
 import sys
 import os
 
@@ -127,13 +128,20 @@ def GetCategories(articles):
         set_cats.add(k)
     return set_cats
 
+def CategoryToRanker(category):
+    return category.replace(' ', '').replace('/', '_')
+    
 '''
     Start main
 '''
 
 file_directory = "files/"
+
 username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"
 password_nlc = "a2gbUnUVx78B"
+
+username_rar = "638bd9ff-2179-469b-93ad-7ca894776fdd"
+password_rar = "8slDdIXgCKjd"
 
 if __name__ == '__main__':
     print("Write classifier name:")
@@ -180,13 +188,6 @@ if __name__ == '__main__':
     
             ranking_data[cat] = ranking_data[cat] + nextEntryRanker
 
-    for k, v in ranking_data.items():
-        k = k.replace(' ', '').replace('/', '_')
-        with open(os.path.join(k + ".csv"), 'w') as file:
-            file.write(v)
-
-    '''
-
     print("Generated: " + str(len(training_data.split('\n'))) + " entries")
     print()
 
@@ -200,4 +201,3 @@ if __name__ == '__main__':
     )
 
     print(json.dumps(classifer, indent=2))
-'''
