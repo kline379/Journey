@@ -7,6 +7,7 @@ import json
 import multiprocessing as mp
 from json2html import *
 from watson_developer_cloud import NaturalLanguageClassifierV1
+import sys
 
 def is_int(s):
     try:
@@ -100,7 +101,7 @@ def GetRelationTypes(articles):
                 'type' : r['type'],
                 'sentence' : r['sentence'],
                 'score' : float(r['score']),
-                'category' : cats
+                'categories' : cats
             }
             if rel['type'] not in types:
                 types[rel['type']] = []
@@ -109,7 +110,7 @@ def GetRelationTypes(articles):
     return types
 
 def GetCategoryCounts(articles):
-    cats_dict = []
+    cats_dict = { }
     for a in articles:
         cats = GetArticleCategories(a)
         for c in cats:
@@ -135,15 +136,21 @@ password_nlc = "a2gbUnUVx78B"
 
 if __name__ == '__main__':
     articles = LoadArticles(file_directory)  
-    types = GetRelationTypes(articles)    
+
     type_cts = GetCategoryCounts(articles)
-    sorted_cts = [(k, type_cts[k]) for k in sorted(type_cts, key=k.get)][:100]
-    for k in sorted_cts:
-        print(k)
+    sorted_cts = [(k, type_cts[k]) for \
+        k in sorted(type_cts, key=lambda x: -type_cts.get(x))]
+    filtered_types = [t[0] for t in sorted_cts \
+        if 10 < t[1] < 3000]
+    
+    types = GetRelationTypes(articles)    
 
-
-'''
     for k in types:
+        for i in range(0, len(types[k])):
+            types[k][i]['categories'] = [c          \
+                for c in types[k][i]['categories']  \
+                if c in filtered_types]
+
         types[k] = sorted(types[k], key=lambda x: -x['score'])
         types[k] = types[k][:600]
 
@@ -152,11 +159,13 @@ if __name__ == '__main__':
         for dat in v:
             s = dat['sentence']
             s = s.replace('"', '""')
-            cat = ','.join(x for x in dat['category'])
+            cat = ','.join(x for x in dat['categories'])
             nextEntry = '"' + s + '",' + cat + '\n'
             if(len(nextEntry) < 1024):
                 training_data = training_data + nextEntry
-
+'''
+    print(training_data)
+'''
     print("Generated: " + str(len(training_data.split('\n'))) + " entries")
     print()
 
@@ -170,4 +179,3 @@ if __name__ == '__main__':
     )
 
     print(json.dumps(classifer, indent=2))
-'''
