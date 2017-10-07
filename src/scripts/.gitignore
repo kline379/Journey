@@ -2,3 +2,4 @@
 files/
 *.csv
 __pycache__
+!cats.csv

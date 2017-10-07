@@ -175,10 +175,11 @@ class Articles:
             cats = a.categories()
             for r in rels:            
                 rel = {
-                        'type' : r['type'],
-                        'sentence' : r['sentence'],
-                        'score' : float(r['score']),
-                        'category' : cats[0] if len(cats) > 0 else ''
+                    'type' : r['type'],
+                    'sentence' : r['sentence'],
+                    'score' : float(r['score']),
+                    'category' : cats[0] if len(cats) > 0 else '',
+                    'id' : a.id
                 }
                 if rel['type'] not in types:
                     types[rel['type']] = []
