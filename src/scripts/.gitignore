@@ -1,3 +1,4 @@
 *.7z
 files/
 *.csv
+__pycache__
