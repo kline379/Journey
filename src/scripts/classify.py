@@ -21,6 +21,7 @@ if __name__ == '__main__':
     numEntries = int(sys.stdin.readline().rstrip())
 
     articles = Articles(file_directory)  
+    cat_classes = CategoryClass.parse('cats.csv')
 
     type_cts = articles.category_counts()
     sorted_cts = [(k, type_cts[k]) for \
@@ -60,7 +61,7 @@ if __name__ == '__main__':
 
     print("Generated: " + str(len(training_data.split('\n'))) + " entries")
     print()
-'''
+
     nlc = NaturalLanguageClassifierV1(username=username_nlc,
         password=password_nlc)
 
@@ -71,4 +72,3 @@ if __name__ == '__main__':
     )
 
     print(json.dumps(classifer, indent=2))
-'''
