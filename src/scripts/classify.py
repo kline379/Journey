@@ -24,20 +24,20 @@ if __name__ == '__main__':
         types[k] = types[k][:numEntries]
 
     training_data = ''
-    for k, v in types.items():
+    for c, v in types.items():
+        ranker = ','.join([CategoryClass.category_to_ranker(k) for \
+            k in c.classes])
+        print(ranker)
         for dat in v:
             s = dat['sentence']
             s = s.replace('"', '""')
-            cat = dat['category']
-            cat = CategoryClass.category_to_ranker(cat)
             score_of_1000 = int(dat['score']*1000)
-
-            nextEntry = '"' + s + '",' + cat + '\n'
+            nextEntry = '"' + s + '",' + ranker + '\n'
             if(len(nextEntry) < 1024):
                 training_data = training_data + nextEntry
 
             nextEntryRanker = '"' + s + '",' + str(score_of_1000) + \
-                ',' + cat + "\n"
+                ',' + ranker + "\n"
 
     print("Generated: " + str(len(training_data.split('\n'))) + " entries")
     print()
