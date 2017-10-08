@@ -1,9 +1,20 @@
 from watson_developer_cloud import NaturalLanguageClassifierV1
+from watson_developer_cloud import RetrieveAndRankV1
 import sys
 import json
 
 username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"
 password_nlc = "a2gbUnUVx78B"
+
+username_rar = "638bd9ff-2179-469b-93ad-7ca894776fdd"
+password_rar = "8slDdIXgCKjd"
+
+def get_ranker_id(rankers, name):
+    for r in rankers:
+        if r['name'] == name:
+            return r['ranker_id']
+    print("The ranker name {} does not have a ranker".format(name))
+    exit()
 
 if __name__ == '__main__':
     nlc = NaturalLanguageClassifierV1(username=username_nlc,
@@ -24,6 +35,15 @@ if __name__ == '__main__':
     classifer_id = classifier_ids[classifier_name]
     status = nlc.status(classifer_id)
 
+    rar = RetrieveAndRankV1(username=username_rar, 
+        password=password_rar)
+    cluster_id = rar.list_solr_clusters()["clusters"][0]["solr_cluster_id"]
+    client = rar.get_pysolr_client(cluster_id, "Wiki_Travel2")
+    rankers = rar.list_rankers()['rankers']
+
+    print("Avaiable rankers:")
+    print(json.dumps(rankers, indent=2))
+
     if status['status'] != 'Available':
         print("Classifier is not avaiable")
         sys.exit(0)
@@ -39,5 +59,9 @@ if __name__ == '__main__':
             key=lambda x: -float(x['confidence']))
 
         for c in classes['classes']:            
-            print("\tClass: %s, scores %s", c['class_name'], c['confidence'])
+            print("\tClass: {}, score: {}".format( \
+                c['class_name'], c['confidence']))
             
+        ranker_id = get_ranker_id(rankers, classes['classes'][0]['class_name'])
+        rslt = client.search(line)
+        rank_rslt = rar.rank(ranker_id, rslt)

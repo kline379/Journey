@@ -51,8 +51,6 @@ class CategoryClass:
 
 ### End CategoryClass
 
-
-
 ### Article class
 ### Contains all the files of a single article
 ### broken down into the different NLU classes
