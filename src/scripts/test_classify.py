@@ -27,7 +27,7 @@ def get_sort_func(articles, classes):
                 if c.in_class(cc):
                     sum = sum + cats[cc]
 
-        return sum
+        return -sum
     return sorter
 
 username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"
