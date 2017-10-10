@@ -35,25 +35,26 @@ if __name__ == '__main__':
     classifer_id = classifier_ids[classifier_name]
     status = nlc.status(classifer_id)
 
+    if status['status'] != 'Available':
+        print("Classifier is not avaiable")
+        sys.exit(0)
+
     rar = RetrieveAndRankV1(username=username_rar, 
         password=password_rar)
     cluster_id = rar.list_solr_clusters()["clusters"][0]["solr_cluster_id"]
     client = rar.get_pysolr_client(cluster_id, "Wiki_Travel2")
     rankers = rar.list_rankers()['rankers']
-
-    print("Avaiable rankers:")
-    print(json.dumps(rankers, indent=2))
-
-    if status['status'] != 'Available':
-        print("Classifier is not avaiable")
-        sys.exit(0)
+    for r in rankers:
+        status = rar.get_ranker_status(r['ranker_id'])
+        name = r['name']
+        print("Ranker: '{}' has status: '{}'".format(name, status['status']))
 
     while True:
         print("Write query: ")
         line = sys.stdin.readline().rstrip()
         if line == 'quit' or line == 'q()':
             sys.exit(1)
-		
+
         classes = nlc.classify(classifer_id, line)
         classes['classes'] = sorted(classes['classes'], \
             key=lambda x: -float(x['confidence']))
@@ -61,7 +62,8 @@ if __name__ == '__main__':
         for c in classes['classes']:            
             print("\tClass: {}, score: {}".format( \
                 c['class_name'], c['confidence']))
-            
+
         ranker_id = get_ranker_id(rankers, classes['classes'][0]['class_name'])
+
         rslt = client.search(line)
-        rank_rslt = rar.rank(ranker_id, rslt)
+        rank_rslt = rar.rank(ranker_id, "I want to go to the beach")
