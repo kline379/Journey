@@ -29,6 +29,9 @@ if __name__ == '__main__':
             if(len(next_entry) < 1024):
                 training_data = training_data + next_entry
 
+        with open(c_ranker + '.csv', 'w') as file:
+            file.write(training_data)
+            
         rslt = rar.create_ranker(training_data=training_data, 
             name=c_ranker) 
         print(json.dumps(rslt, indent=2))

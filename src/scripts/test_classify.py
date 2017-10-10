@@ -48,6 +48,8 @@ if __name__ == '__main__':
         status = rar.get_ranker_status(r['ranker_id'])
         name = r['name']
         print("Ranker: '{}' has status: '{}'".format(name, status['status']))
+        if status['status'] != 'Avaiable':
+            print("\tDescription: {}".format(status['status_description']))
 
     while True:
         print("Write query: ")
