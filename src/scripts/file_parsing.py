@@ -230,4 +230,11 @@ class Articles:
             cat_class[k] = sorted(cat_class[k], key=lambda x: -x['score'])
         return cat_class
 
+    def get_article_by_id(self, id):
+        for a in self.articles:
+            if a.id == id:
+                return a
+        print("Article with id: {} was not found".format(id))
+        exit(1)        
+
 ### End Articles class

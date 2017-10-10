@@ -2,12 +2,7 @@ from watson_developer_cloud import NaturalLanguageClassifierV1
 from watson_developer_cloud import RetrieveAndRankV1
 import sys
 import json
-
-username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"
-password_nlc = "a2gbUnUVx78B"
-
-username_rar = "638bd9ff-2179-469b-93ad-7ca894776fdd"
-password_rar = "8slDdIXgCKjd"
+from file_parsing import *
 
 def get_ranker_id(rankers, name):
     for r in rankers:
@@ -15,6 +10,29 @@ def get_ranker_id(rankers, name):
             return r['ranker_id']
     print("The ranker name {} does not have a ranker".format(name))
     exit()
+
+def get_sort_func(articles, classes):
+    def sorter(article):
+        sorter.cs = classes
+        sorter.ats = articles
+
+        id = int(article['id'])
+        a = sorter.ats.get_article_by_id(id)
+        cats = a.categories()
+
+        for c in cats:
+            print(c)
+
+        return 1
+    return sorter
+
+username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"
+password_nlc = "a2gbUnUVx78B"
+
+username_rar = "638bd9ff-2179-469b-93ad-7ca894776fdd"
+password_rar = "8slDdIXgCKjd"
+
+file_directory = 'files/'
 
 if __name__ == '__main__':
     nlc = NaturalLanguageClassifierV1(username=username_nlc,
@@ -43,6 +61,8 @@ if __name__ == '__main__':
         password=password_rar)
     cluster_id = rar.list_solr_clusters()["clusters"][0]["solr_cluster_id"]
     client = rar.get_pysolr_client(cluster_id, "Wiki_Travel2")
+
+    '''
     rankers = rar.list_rankers()['rankers']
     for r in rankers:
         status = rar.get_ranker_status(r['ranker_id'])
@@ -50,6 +70,10 @@ if __name__ == '__main__':
         print("Ranker: '{}' has status: '{}'".format(name, status['status']))
         if status['status'] != 'Avaiable':
             print("\tDescription: {}".format(status['status_description']))
+    '''
+
+    articles = Articles(file_directory)
+    cat_classes = CategoryClass.parse('cats.csv')
 
     while True:
         print("Write query: ")
@@ -60,12 +84,22 @@ if __name__ == '__main__':
         classes = nlc.classify(classifer_id, line)
         classes['classes'] = sorted(classes['classes'], \
             key=lambda x: -float(x['confidence']))
-
-        for c in classes['classes']:            
-            print("\tClass: {}, score: {}".format( \
-                c['class_name'], c['confidence']))
-
-        ranker_id = get_ranker_id(rankers, classes['classes'][0]['class_name'])
+        top_class = classes['classes'][0]['class_name']
 
         rslt = client.search(line)
-        rank_rslt = rar.rank(ranker_id, "I want to go to the beach")
+        
+        i = 0
+        print("Before ranking\n\n")
+        for r in rslt:
+            print("Number {}: {}".format(i, r['title']))
+            i = i + 1
+        
+        print("After ranking\n\n")
+        rslt = sorted(rslt, key=get_sort_func(articles, cat_classes))
+        i = 0
+        for r in rslt:
+            print("Number {}: {}".format(i, r['title']))
+            i = i + 1
+
+        #ranker_id = get_ranker_id(rankers, top_class)
+        #rank_rslt = rar.rank(ranker_id, "I want to go to the beach")
