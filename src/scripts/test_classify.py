@@ -18,12 +18,16 @@ def get_sort_func(articles, classes):
 
         id = int(article['id'])
         a = sorter.ats.get_article_by_id(id)
-        cats = a.categories()
+        cats = a.category_rankings()
 
-        for c in cats:
-            print(c)
+        sum = 0
 
-        return 1
+        for cc in cats:
+            for c in sorter.cs:
+                if c.in_class(cc):
+                    sum = sum + cats[cc]
+
+        return sum
     return sorter
 
 username_nlc = "9a25363d-7524-4904-ae1d-f55fa833a1ca"

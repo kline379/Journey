@@ -136,6 +136,15 @@ class Article:
                 rtn.append(cur[:-1])
         return rtn 
 
+    def category_rankings(self):
+        cats = self.get_file_type(Article.CATEGORIES)
+        rtn = {}
+        for c in cats:
+            label = c['label'].split('/')[1:]            
+            if len(label) > 0:
+                rtn[label[0]] = float(c['score'])
+        return rtn
+
 ### End Member functions
 
 ### End Article class
