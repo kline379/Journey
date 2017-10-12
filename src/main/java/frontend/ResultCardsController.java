@@ -29,13 +29,8 @@ public class ResultCardsController {
   private List<Card> process(String query) throws Exception {
 	  List<Card> cardList = new ArrayList<Card>();
 	  
-<<<<<<< HEAD
-    QueryRetriever retriever = new QueryRetriever();   
-
-=======
 	  QueryRetriever retriever = new QueryRetriever();
 	  retriever.Initialize();
->>>>>>> master
 	  SolrDocumentList documents = retriever.RetrieveQueries(query);
 	  for(int i = 0; i < documents.size(); i++) {
       String title = documents.get(i).getFieldValue("title").toString();

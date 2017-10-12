@@ -16,13 +16,6 @@ import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrCluster;
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrClusters;
 import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrCluster.Status;
 
-<<<<<<< HEAD
-/**
- * Hello world!
- *
- */
-=======
->>>>>>> master
 public class QueryRetriever 
 {   
 	final String USERNAME = "638bd9ff-2179-469b-93ad-7ca894776fdd";
