@@ -1,11 +1,20 @@
 package backend;
 
 public class QueryClass {
-    String ClassName;
-    double Score;
 
     public QueryClass(String className, double score) {
-        this.ClassName = className;
-        this.Score = score;
+        _ClassName = className;
+        _Score = score;
+    }
+
+    private String _ClassName;
+    private double _Score;
+
+    public String ClassName() {
+        return _ClassName;
+    }
+
+    public double Score() {
+        return _Score;
     }
 }

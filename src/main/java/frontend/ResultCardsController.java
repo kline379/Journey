@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.*;
 import backend.QueryRetriever;
+import backend.QueryClassifier;
+import backend.QueryClass;
 import org.apache.solr.common.SolrDocumentList;
+import java.util.Iterator;
 
 @Controller
 public class ResultCardsController {
@@ -26,14 +29,25 @@ public class ResultCardsController {
   private List<Card> process(String query) throws Exception {
 	  List<Card> cardList = new ArrayList<Card>();
 	  
-	  QueryRetriever retriever = new QueryRetriever();
+    QueryRetriever retriever = new QueryRetriever();   
+
 	  SolrDocumentList documents = retriever.RetrieveQueries(query);
 	  for(int i = 0; i < documents.size(); i++) {
       String title = documents.get(i).getFieldValue("title").toString();
       String body = documents.get(i).getFieldValues("body").toString();
-		  cardList.add(new Card(title, body));
+      String id = documents.get(i).getFieldValues("id").toString();
+		  cardList.add(new Card(title, id, body));
 	  }
 	  
 	  return cardList;
   }
+
+  private List<QueryClass> getClasses(String query) {    
+    QueryClassifier classifier = new QueryClassifier();
+    classifier.SetClassifier(classifier.GetClassifierIds().get(0));
+    List<QueryClass> classes = classifier.GetClasses(query);   
+    return classes;
+  }
+
+
 }
