@@ -43,11 +43,11 @@ public class ResultCardsController {
 	  return cardList;
   }
 
+  /*
   private List<QueryClass> getClasses(String query) {    
     QueryClassifier classifier = new QueryClassifier();
-    classifier.SetClassifier(classifier.GetClassifierIds().get(0));
     List<QueryClass> classes = classifier.GetClasses(query);   
     return classes;
   }
-  
+  */
 }
