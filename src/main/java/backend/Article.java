@@ -1,3 +1,5 @@
+package backend;
+
 public class Article {
 	private String title;
 	private String id;

@@ -10,6 +10,7 @@ import java.io.*;
 import backend.QueryRetriever;
 import backend.QueryClassifier;
 import backend.QueryClass;
+import backend.Article;
 import org.apache.solr.common.SolrDocumentList;
 import java.util.Iterator;
 
@@ -21,13 +22,13 @@ public class ResultCardsController {
       @RequestParam(value = "searchQuery", required = true, defaultValue = "World") String query, Model model) 
     		  throws Exception {
 
-    List<Card> results = process(query);
+    List<Article> results = process(query);
     model.addAttribute("results", results);
     return "cards";
   }
 
-  private List<Card> process(String query) throws Exception {
-	  List<Card> cardList = new ArrayList<Card>();
+  private List<Article> process(String query) throws Exception {
+	  List<Article> cardList = new ArrayList<Article>();
 	  
 	  QueryRetriever retriever = new QueryRetriever();
 	  retriever.Initialize();
@@ -36,7 +37,7 @@ public class ResultCardsController {
       String title = documents.get(i).getFieldValue("title").toString();
       String body = documents.get(i).getFieldValues("body").toString();
       String id = documents.get(i).getFieldValues("id").toString();
-		  cardList.add(new Card(title, id, body));
+		  cardList.add(new Article(title, id, body));
 	  }
 	  
 	  return cardList;
@@ -48,6 +49,5 @@ public class ResultCardsController {
     List<QueryClass> classes = classifier.GetClasses(query);   
     return classes;
   }
-
-
+  
 }

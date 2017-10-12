@@ -73,6 +73,4 @@ public class QueryClassifier {
         return classes;
     }
     
-    public List<ArticleClass> GetArticleClasses()
-
 }
