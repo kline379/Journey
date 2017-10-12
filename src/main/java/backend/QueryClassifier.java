@@ -1,8 +1,9 @@
 package backend;
 
 import java.util.List;
-
-import com.sun.org.apache.xpath.internal.operations.String;
+import java.util.ArrayList;
+import java.util.Iterator;
+import com.ibm.watson.developer_cloud.natural_language_classifier.v1;
 
 public class QueryClassifier {
 
@@ -12,7 +13,7 @@ public class QueryClassifier {
     private NaturalLanguageClassifier _Service = new NaturalLanguageClassifier();
     private String _Classifier = null;
 
-    public QueryClassifer() {
+    public QueryClassifier() {
         _Service.setUsernameAndPassword(_NLCUsername, _NLCPassword);        
     }
 
@@ -27,7 +28,7 @@ public class QueryClassifier {
         return ids;
     }
 
-    public SetClassifier(string classifierId) {
+    public void SetClassifier(String classifierId) {
         _Classifer = classifierId;
     }
 
@@ -41,13 +42,16 @@ public class QueryClassifier {
             .classify(_Classifier, query)
             .execute()
             .getClasses();
-            
-        for(ClassifiedClass class : classified) {
+        
+        Iterator<ClassifiedClass> it = classified.iterator();
+        while(it.hasNext()) { 
+            ClassifiedClass next = it.next();
             QueryClass qc = new QueryClass(
-                class.getName(), class.getConfidence()
+                next.getName(), next.getConfidence()
             );
-            classes.add(qc);            
+            classes.add(qc);
         }
+            
         return qc;
     }
 
