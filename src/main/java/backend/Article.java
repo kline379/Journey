@@ -61,7 +61,7 @@ public class Article {
 		public int compare(Article lhs, Article rhs) {
 			double lhsScore = lhs.QueryScore(_Class);
 			double rhsScore = rhs.QueryScore(_Class);
-			return Double.compare(lhsScore, rhsScore);
+			return -Double.compare(lhsScore, rhsScore);
 		}
 	}
 }

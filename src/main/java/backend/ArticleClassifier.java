@@ -55,9 +55,6 @@ public class ArticleClassifier {
 
 	public List<ArticleClass> GetArticleClasses(String id) {
 		List<ArticleClass> ac = _ArticleClasses.get(id);
-		if(ac == null) {
-			System.out.println("Article id: " + id + " does not have classses");
-		}
 		return ac;
 	}
 

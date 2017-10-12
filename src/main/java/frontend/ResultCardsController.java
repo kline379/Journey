@@ -26,7 +26,9 @@ public class ResultCardsController {
     		  throws Exception {
 
     List<Article> results = process(query);
+    // This is what is used to sort the articles
     results = rankArticles(results, query);
+    // ----------------------------------------
     model.addAttribute("results", results);
     return "cards";
   }

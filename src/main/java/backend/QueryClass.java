@@ -44,7 +44,7 @@ public class QueryClass {
         public QcCompartor() { }
         @Override
         public int compare(QueryClass lhs, QueryClass rhs) {
-            return Double.compare(lhs._Score, rhs._Score);
+            return -Double.compare(lhs._Score, rhs._Score);
         }
     }
 }
