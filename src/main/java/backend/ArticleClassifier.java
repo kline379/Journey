@@ -3,15 +3,16 @@ package backend;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.io.*;
 
 public class ArticleClassifier {
 	private Map<String, List<ArticleClass>> _ArticleClasses;
 
-	private ArticleClassifier(Map<String, List<ArticleClass>> mapping) {
+	private ArticleClassifier(Map<String, List<ArticleClass>> mapping) 
+	{
 		_ArticleClasses = mapping;
+
 	}
 	
 	public static ArticleClassifier ParseClasses(String path)
@@ -53,7 +54,11 @@ public class ArticleClassifier {
 	}
 
 	public List<ArticleClass> GetArticleClasses(String id) {
-		return _ArticleClasses.get(id);
+		List<ArticleClass> ac = _ArticleClasses.get(id);
+		if(ac == null) {
+			System.out.println("Article id: " + id + " does not have classses");
+		}
+		return ac;
 	}
 
 }
