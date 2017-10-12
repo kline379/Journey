@@ -13,7 +13,7 @@ class ArticleLookup:
         return ArticleLookup(brk[0], brk[1], brk[2])
 
     def to_string(self):
-        return "{},{},{}".format(self.id, self.label, self.score)
+        return "{}|{}|{}".format(self.id, self.label, self.score)
 
 if __name__ == '__main__':
 

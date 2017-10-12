@@ -11,6 +11,8 @@ import backend.QueryRetriever;
 import backend.QueryClassifier;
 import backend.QueryClass;
 import backend.Article;
+import backend.ArticleClassifier;
+import backend.ArticleClass;
 import org.apache.solr.common.SolrDocumentList;
 import java.util.Iterator;
 
@@ -27,7 +29,16 @@ public class ResultCardsController {
     return "cards";
   }
 
+  private static ArticleClassifier _ArticleClassifier = null;
+  private static final String _ArticleClassesPath = "src/scripts/id_matching.csv";
+
   private List<Article> process(String query) throws Exception {
+    if(_ArticleClassifier == null) {
+      synchronized(this) {
+        _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
+      }
+    }
+
 	  List<Article> cardList = new ArrayList<Article>();
 	  
 	  QueryRetriever retriever = new QueryRetriever();
@@ -37,9 +48,9 @@ public class ResultCardsController {
       String title = documents.get(i).getFieldValue("title").toString();
       String body = documents.get(i).getFieldValues("body").toString();
       String id = documents.get(i).getFieldValues("id").toString();
-		  cardList.add(new Article(title, id, body));
-	  }
-	  
+      List<ArticleClass> acs = _ArticleClassifier.GetArticleClasses(id);
+		  cardList.add(new Article(title, id, body, acs));
+	  }	  
 	  return cardList;
   }
 

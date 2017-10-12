@@ -14,58 +14,46 @@ public class ArticleClassifier {
 		_ArticleClasses = mapping;
 	}
 	
-	private static int _GetLineCount(String file) 
-		throws FileNotFoundException, IOException
-	{
-		int lineCt = 0;
-		InputStream is = new BufferedInputStream(new FileInputStream(file));
-		try {
-			byte[] c = new byte[1024];
-			int readChars = 0;
-			while((readChars = is.read(c)) != -1) {
-				for(int i = 0; i < readChars; ++i) {
-					if(c[i] == '\n') ++lineCt;
-				}
-			}
-			is.close();
-			return lineCt;
-		} finally {
-			is.close();
-			return -1;
-		}
-	}	
-
 	public static ArticleClassifier ParseClasses(String path)
-		throws FileNotFoundException, IOException
+		throws FileNotFoundException, IOException, Exception
 	{
-		int lineCt = _GetLineCount(path);
 		Map<String, List<ArticleClass>> mapping 
-			= new HashMap<String, List<ArticleClass>>(lineCt);
+			= new HashMap<String, List<ArticleClass>>();
 
 		FileReader fr = new FileReader(path);
 		BufferedReader br = new BufferedReader(fr);
 		String line = null;
 		while((line = br.readLine()) != null) {
-			List<String> cols = Arrays.asList(line.split(","));
-			String id = cols.get(0);
-			String aClass = cols.get(1);
-			double confidence = Double.valueOf(cols.get(2));
-			ArticleClass ac = new ArticleClass(id, aClass, confidence);	
+			String c0, c1, c2;
+			c0 = c1 = c2 = "";
+			try {
+				String[] cols = line.split("\\|");				
+				c0 = cols[0]; c1 = cols[1]; c2 = cols[2];
+				String id = c0;
+				String aClass = c1;
+				double confidence = Double.parseDouble(c2);
+				ArticleClass ac = new ArticleClass(aClass, confidence);	
 
-			if(mapping.containsKey(id)) {
-				mapping.get(id).add(ac);
-			} else {
-				ArrayList<ArticleClass> articles = new ArrayList<ArticleClass>();
-				articles.add(ac);
-				mapping.put(id, articles);
+				if(mapping.containsKey(id)) {
+					mapping.get(id).add(ac);
+				} else {
+					ArrayList<ArticleClass> articles = new ArrayList<ArticleClass>();
+					articles.add(ac);
+					mapping.put(id, articles);
+				}
+			} catch (Exception e) {
+				String what = e.toString();
+				what += ". At line: " + line + ". ";
+				what += "c0: " + c0 + ". c1:" + c1 + ". c2: " + c2;
+				throw new Exception(what);
 			}
 		}
 		br.close();
 		return new ArticleClassifier(mapping);
 	}
 
-	public List<ArticleClass> GetArticleClasses(Article article) {
-		return _ArticleClasses.get(article.getId());
+	public List<ArticleClass> GetArticleClasses(String id) {
+		return _ArticleClasses.get(id);
 	}
 
 }

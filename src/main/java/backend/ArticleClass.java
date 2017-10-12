@@ -7,22 +7,15 @@ import java.io.*;
 
 public class ArticleClass {
 
-	private String _ArticleId;
 	private String _Class;
 	private double _Confidence;
 
 	public ArticleClass(
-		String articleId, 
 		String articleClass,
 		double confidence
 	) {
-		_ArticleId = articleId;
 		_Class = articleClass;
 		_Confidence = confidence;
-	}
-
-	public String Id() {
-		return _ArticleId;		
 	}
 
 	public String Class() {

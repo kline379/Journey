@@ -22,11 +22,11 @@ public class QueryClass {
         return _Score;
     }
 
-    public boolean InQuery(ArticleClass article) {
+    public boolean InQuery(String category) {
         Iterator<String> it = _Classes.iterator();
         while(it.hasNext()) {
             String next = it.next();
-            if(next.equals(article.Class())) return true;
+            if(next.equals(category)) return true;
         }
         return false;
     }
