@@ -6,9 +6,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.io.*;
 import backend.QueryRetriever;
+import backend.QueryClassifier;
+import backend.QueryClass;
+import backend.Article;
+import backend.ArticleClassifier;
+import backend.ArticleClass;
 import org.apache.solr.common.SolrDocumentList;
+import java.util.Iterator;
 
 @Controller
 public class ResultCardsController {
@@ -18,13 +25,24 @@ public class ResultCardsController {
       @RequestParam(value = "searchQuery", required = true, defaultValue = "World") String query, Model model) 
     		  throws Exception {
 
-    List<Card> results = process(query);
+    List<Article> results = process(query);
+    results = rankArticles(results, query);
     model.addAttribute("results", results);
     return "cards";
   }
 
-  private List<Card> process(String query) throws Exception {
-	  List<Card> cardList = new ArrayList<Card>();
+  private static Object _ArticleLock = new Object();
+  private static ArticleClassifier _ArticleClassifier = null;
+  private static final String _ArticleClassesPath = "src/scripts/id_matching.csv";
+
+  private List<Article> process(String query) throws Exception {
+    if(_ArticleClassifier == null) {
+      synchronized(_ArticleLock) {
+        _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
+      }
+    }
+
+	  List<Article> cardList = new ArrayList<Article>();
 	  
 	  QueryRetriever retriever = new QueryRetriever();
 	  retriever.Initialize();
@@ -32,9 +50,25 @@ public class ResultCardsController {
 	  for(int i = 0; i < documents.size(); i++) {
       String title = documents.get(i).getFieldValue("title").toString();
       String body = documents.get(i).getFieldValues("body").toString();
-		  cardList.add(new Card(title, body));
-	  }
-	  
+      String id = documents.get(i).getFieldValues("id").toString();
+      id = id.replace("[", "").replace("]", "");
+      List<ArticleClass> acs = _ArticleClassifier.GetArticleClasses(id);
+		  cardList.add(new Article(title, id, body, acs));
+	  }	  
 	  return cardList;
+  }
+  
+  private List<Article> rankArticles(List<Article> articles, String query) {    
+    QueryClassifier classifier = new QueryClassifier();
+    List<QueryClass> classes = classifier.GetClasses(query);   
+
+    Comparator<QueryClass> qcC = new QueryClass.QcCompartor();
+    classes.sort(qcC);
+
+    QueryClass topClass = classes.get(0);
+    Comparator<Article> comp = new Article.ArticleComparator(topClass);
+    articles.sort(comp);
+
+    return articles;
   }
 }

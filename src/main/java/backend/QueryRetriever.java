@@ -53,9 +53,11 @@ public class QueryRetriever
 				HttpSolrClientUtils.createHttpClient(this.endPoint, this.USERNAME, this.PASSWORD));
 	}
 	
-    public SolrDocumentList RetrieveQueries(String query) throws InterruptedException, SolrServerException, IOException{
+	public SolrDocumentList RetrieveQueries(String query) 
+		throws InterruptedException, SolrServerException, IOException
+	{
     	SolrQuery solrQuery = new SolrQuery(query);
-    	QueryResponse response = this.solrClient.query("Wiki_Travel", solrQuery);
+    	QueryResponse response = this.solrClient.query("Wiki_Travel2", solrQuery);
     	
     	return response.getResults();
     }
