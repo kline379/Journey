@@ -1,0 +1,50 @@
+#index-search {
+  text-align: center;
+  padding-top: 10%;
+}
+
+input[type=text] {
+  width: 750px;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100px;
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+  padding: 12px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  color: #fff;
+  background-color: #286090;
+  border-color: #204d74;
+}
+
+#rank-buttons {
+  float: right;
+}
+
+.search-form {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 30px;
+}
+
+form {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
