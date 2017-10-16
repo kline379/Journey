@@ -6,9 +6,9 @@ import java.util.Comparator;
 
 public class Article {
 
-	private String title;
-	private String id;
-	private String description;
+	public String title;
+	public String id;
+	public String description;
 	private List<ArticleClass> classes;
   
 	public Article(

@@ -23,15 +23,18 @@ public class ResultCardsController {
   @RequestMapping("/results")
   public String populateCards(
     @RequestParam(value = "query", required = true, defaultValue = "World") String query,
-    @RequestParam(value = "rank", required = false, defaultValue = "unranked") String rank, Model model)
+    @RequestParam(value = "rank", required = false, defaultValue = "unranked") String rank, 
+    Model model
+  )
     throws Exception 
   {
-    model.addAttribute("query", query);
     List<Article> results = process(query);
     if(rank == "ranked") {
       results = rankArticles(results, query);
     }
+    model.addAttribute("query", query);
     model.addAttribute("results", results);
+    model.addAttribute("ranked", rank);    
     return "cards";
   }
 
