@@ -83,6 +83,7 @@ public class HttpSolrClientUtils {
                 RequestConfig.copy(RequestConfig.DEFAULT).setRedirectsEnabled(true).build())
         .setDefaultCredentialsProvider(credentialsProvider)
         .addInterceptorFirst(new PreemptiveAuthInterceptor());
+    
     HttpClient client = builder.build();
     return client;
   }

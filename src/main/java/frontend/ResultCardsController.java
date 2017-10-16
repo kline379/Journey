@@ -6,65 +6,73 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.io.*;
 import backend.QueryRetriever;
+import backend.QueryClassifier;
+import backend.QueryClass;
+import backend.Article;
+import backend.ArticleClassifier;
+import backend.ArticleClass;
 import org.apache.solr.common.SolrDocumentList;
+import java.util.Iterator;
 
 @Controller
 public class ResultCardsController {
 
   @RequestMapping("/results")
-  public String populateCards (
-      @RequestParam(value = "query", required = true, defaultValue = "World") String query,
-      @RequestParam(value = "rank", required = false, defaultValue = "unranked") String rank,
-      Model model) throws Exception {
-
-    List<Card> results;
-    switch (rank) {
-      case "unranked":
-        model.addAttribute("ranked", false);
-        results = processUnranked(query);
-        break;
-      case "ranked":
-        model.addAttribute("ranked", true);
-        results = processRanked(query);
-        break;
-      default:
-        model.addAttribute("ranked", false);
-        results = processUnranked(query);
-        break;
-    }
-
+  public String populateCards(
+    @RequestParam(value = "query", required = true, defaultValue = "World") String query,
+    @RequestParam(value = "rank", required = false, defaultValue = "unranked") String rank, Model model)
+    throws Exception 
+  {
     model.addAttribute("query", query);
+    List<Article> results = process(query);
+    if(rank == "ranked") {
+      results = rankArticles(results, query);
+    }
     model.addAttribute("results", results);
     return "cards";
   }
 
-  private List<Card> processUnranked(String query) throws Exception {
-	  List<Card> cardList = new ArrayList<Card>();
+  private static Object _ArticleLock = new Object();
+  private static ArticleClassifier _ArticleClassifier = null;
+  private static final String _ArticleClassesPath = "src/scripts/id_matching.csv";
+
+  private List<Article> process(String query) throws Exception {
+    if(_ArticleClassifier == null) {
+      synchronized(_ArticleLock) {
+        _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
+      }
+    }
+
+	  List<Article> cardList = new ArrayList<Article>();
 	  
 	  QueryRetriever retriever = new QueryRetriever();
+	  retriever.Initialize();
 	  SolrDocumentList documents = retriever.RetrieveQueries(query);
 	  for(int i = 0; i < documents.size(); i++) {
       String title = documents.get(i).getFieldValue("title").toString();
       String body = documents.get(i).getFieldValues("body").toString();
-		  cardList.add(new Card(title, body));
-	  }
-	  
+      String id = documents.get(i).getFieldValues("id").toString();
+      id = id.replace("[", "").replace("]", "");
+      List<ArticleClass> acs = _ArticleClassifier.GetArticleClasses(id);
+		  cardList.add(new Article(title, id, body, acs));
+	  }	  
 	  return cardList;
   }
+  
+  private List<Article> rankArticles(List<Article> articles, String query) {    
+    QueryClassifier classifier = new QueryClassifier();
+    List<QueryClass> classes = classifier.GetClasses(query);   
 
-  private List<Card> processRanked(String query) throws Exception {
-    List<Card> cards = new ArrayList<Card>();
-    Card zero = new Card(query, "This should be here too");
-    Card one = new Card("Myrtle Beach, SC", "One beach");
-    Card two = new Card("Daytona Beach, FL", "Two Beach");
-    Card three = new Card("Miami, FL", "Red Beach");
-    Card four = new Card("Malibu, CA", "Blue Beach");
-    cards.add(zero);
-    cards.add(one);
-    cards.add(two);
-    cards.add(three);
-    cards.add(four);
-    return cards;
+    Comparator<QueryClass> qcC = new QueryClass.QcCompartor();
+    classes.sort(qcC);
+
+    QueryClass topClass = classes.get(0);
+    Comparator<Article> comp = new Article.ArticleComparator(topClass);
+    articles.sort(comp);
+
+    return articles;
   }
 }
