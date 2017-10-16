@@ -25,8 +25,8 @@
                 <input type="submit" value="Hmmm..."/>
             </div>
             <div id="rank-buttons">
-                <input name="rank" type="radio" value ="unranked" th:checked="${ranked}">Unranked</input>
-                <input name="rank" type="radio" value ="ranked" th:checked="${ranked}">Ranked</input>
+                <input name="rank" type="radio" value ="unranked" th:checked="${ranked == 'unranked'}">Unranked</input>
+                <input name="rank" type="radio" value ="ranked" th:checked="${ranked == 'ranked'}">Ranked</input>
             </div>
         </form>
     </div>

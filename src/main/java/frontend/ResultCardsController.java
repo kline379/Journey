@@ -29,7 +29,7 @@ public class ResultCardsController {
     throws Exception 
   {
     List<Article> results = process(query);
-    if(rank == "ranked") {
+    if(rank.equals("ranked")) {
       results = rankArticles(results, query);
     }
     model.addAttribute("query", query);
@@ -65,7 +65,7 @@ public class ResultCardsController {
 	  return cardList;
   }
   
-  private List<Article> rankArticles(List<Article> articles, String query) {    
+  private List<Article> rankArticles(List<Article> articles, String query) {   
     QueryClassifier classifier = new QueryClassifier();
     List<QueryClass> classes = classifier.GetClasses(query);   
 
