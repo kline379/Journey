@@ -18,7 +18,6 @@
     <script src="parse.js"></script>
 </head>
 <body>
-
     <div class="search-form">
         <form action="/results" method="get">
             <div class="search">
@@ -26,12 +25,11 @@
                 <input type="submit" value="Hmmm..."/>
             </div>
             <div id="rank-buttons">
-                <input name="rank" type="radio" value ="unranked" th:checked="${!ranked}">Unranked</input>
-                <input name="rank" type="radio" value ="ranked" th:checked="${ranked}">Ranked</input>
+                <input name="rank" type="radio" value ="unranked" th:checked="${ranked == 'unranked'}">Unranked</input>
+                <input name="rank" type="radio" value ="ranked" th:checked="${ranked == 'ranked'}">Ranked</input>
             </div>
         </form>
     </div>
-
     <div th:each="card, iter: ${results}" align="center">
         <div class="card card-inverse card-primary mb-3 " style="width: 40rem; color: white;">
             <div class="card-img grad" width="25%"/>

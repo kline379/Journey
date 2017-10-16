@@ -24,7 +24,7 @@ public class GreetingControllerTest {
 
     @Test
     public void shouldReturnDefaultMessage() throws Exception {
-        this.mockMvc.perform(get("/greeting")).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString("Daytona Beach")));
+        this.mockMvc.perform(get("/results"))
+        .andExpect(status().isOk());
     }
 }
