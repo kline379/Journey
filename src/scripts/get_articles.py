@@ -35,13 +35,11 @@ def process_el(doc, dir):
     with codecs.open(os.path.join(dir, id + ".json"), 'w', 'utf-8') as file:
         file.write(json.dumps(doc))
 
-base_path = R"K:\OneDrive\CSE 5914\Python Scripts"
 xmlPath = R"wikitravel-en-20090302.xml"
 
 output_path = "files"
 
 if __name__ == "__main__":
-    xmlPath = os.path.join(base_path, xmlPath)
     docs = parse_travel(xmlPath)
 
     for d in docs:
