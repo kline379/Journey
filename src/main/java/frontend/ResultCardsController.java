@@ -40,7 +40,7 @@ public class ResultCardsController {
 
   private static Object _ArticleLock = new Object();
   private static ArticleClassifier _ArticleClassifier = null;
-  private static final String _ArticleClassesPath = "src/scripts/id_matching.csv";
+  private static final String _ArticleClassesPath = "src/main/resources/id_matching.csv";
 
   private List<Article> process(String query) throws Exception {
     if(_ArticleClassifier == null) {
