@@ -27,26 +27,20 @@ public class ArticleClassifier {
 		while((line = br.readLine()) != null) {
 			String c0, c1, c2;
 			c0 = c1 = c2 = "";
-			try {
-				String[] cols = line.split("\\|");				
-				c0 = cols[0]; c1 = cols[1]; c2 = cols[2];
-				String id = c0;
-				String aClass = c1;
-				double confidence = Double.parseDouble(c2);
-				ArticleClass ac = new ArticleClass(aClass, confidence);	
+			
+			String[] cols = line.split("\\|");				
+			c0 = cols[0]; c1 = cols[1]; c2 = cols[2];
+			String id = c0;
+			String aClass = c1;
+			double confidence = Double.parseDouble(c2);
+			ArticleClass ac = new ArticleClass(aClass, confidence);	
 
-				if(mapping.containsKey(id)) {
-					mapping.get(id).add(ac);
-				} else {
-					ArrayList<ArticleClass> articles = new ArrayList<ArticleClass>();
-					articles.add(ac);
-					mapping.put(id, articles);
-				}
-			} catch (Exception e) {
-				String what = e.toString();
-				what += ". At line: " + line + ". ";
-				what += "c0: " + c0 + ". c1:" + c1 + ". c2: " + c2;
-				throw new Exception(what);
+			if(mapping.containsKey(id)) {
+				mapping.get(id).add(ac);
+			} else {
+				ArrayList<ArticleClass> articles = new ArrayList<ArticleClass>();
+				articles.add(ac);
+				mapping.put(id, articles);
 			}
 		}
 		br.close();
