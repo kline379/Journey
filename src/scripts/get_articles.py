@@ -1,6 +1,3 @@
-from watson_developer_cloud import NaturalLanguageUnderstandingV1
-import watson_developer_cloud.natural_language_understanding.features.v1 \
-  as Features
 import sys
 import xml.etree.ElementTree as et
 import multiprocessing as mp
@@ -10,18 +7,6 @@ import json
 import sys
 from time import sleep
 from json2html import *
-from watson_developer_cloud import RetrieveAndRankV1
-
-base_path = R"K:\OneDrive\CSE 5914\Python Scripts"
-xmlPath = R"wikitravel-en-20090302.xml"
-
-output_path = "files"
-
-username_nlu = "0d758ea1-3d20-42f1-8140-75233955f6e5"
-password_nlu = "Eozo4ibLtjVF"
-
-username_rar = "638bd9ff-2179-469b-93ad-7ca894776fdd"
-password_rar = "8slDdIXgCKjd"
 
 def parse_docs(el):
     id = el.find('id').text
@@ -50,9 +35,14 @@ def process_el(doc, dir):
     with codecs.open(os.path.join(dir, id + ".json"), 'w', 'utf-8') as file:
         file.write(json.dumps(doc))
 
+base_path = R"K:\OneDrive\CSE 5914\Python Scripts"
+xmlPath = R"wikitravel-en-20090302.xml"
+
+output_path = "files"
+
 if __name__ == "__main__":
     xmlPath = os.path.join(base_path, xmlPath)
     docs = parse_travel(xmlPath)
 
     for d in docs:
-        process_el(d, 'path') 
+        process_el(d, output_path) 
