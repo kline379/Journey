@@ -42,9 +42,9 @@ public class ResultCardsController {
 
   private static Object _ArticleLock = new Object();
   private static ArticleClassifier _ArticleClassifier = null;
-  private static final String _ArticleClassesPath = "classes/id_matching.csv";
+  private static final String _ArticlesFile = "id_matching";
 
-  void _GetAllSubdirs(String path, ArrayList<File> files) {
+  static void _GetAllSubdirs(String path, ArrayList<File> files) {
     File directory = new File(path);
 
     File[] fList = directory.listFiles();
@@ -58,27 +58,29 @@ public class ResultCardsController {
     }
   }
 
+  static String _GetArticlePath(String dir, String lookingFor) 
+    throws Exception
+  {
+    ArrayList<File> files = new ArrayList<File>();
+    _GetAllSubdirs(Paths.get("").toAbsolutePath().toString(), files);
+    
+    for(File f : files) {
+      String fullPath = f.getAbsolutePath().toString();
+      if(fullPath.toLowerCase().contains(lookingFor.toLowerCase())) {
+        return fullPath; 
+      }
+    }
+    throw new Exception("file: " + lookingFor + " could not be found");
+  }
+
   private List<Article> process(String query) throws Exception {    
     if(_ArticleClassifier == null) {
       synchronized(_ArticleLock) {
-        try {
-          _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
-        } 
-        catch (Exception e) {
-          ArrayList<File> files = new ArrayList<File>();
-          _GetAllSubdirs(Paths.get("").toAbsolutePath().toString(), files);
-          
-          String lookFor = "id_matching";
-          String dump = "";
-          for(File f : files) {
-            dump += f.getAbsolutePath().toString() + "\n";
-            if(f.toString().contains(lookFor.toLowerCase())) {
-              throw new Exception(f.getAbsolutePath().toString());
-            }
-          }
-          throw new Exception(dump);
-        } 
-        finally { }
+        String path = _GetArticlePath(
+          Paths.get("").toAbsolutePath().toString(),
+          _ArticlesFile
+        );
+        _ArticleClassifier = ArticleClassifier.ParseClasses(path);      
       }
     }
 
