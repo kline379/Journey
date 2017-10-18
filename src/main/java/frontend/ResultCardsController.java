@@ -16,6 +16,7 @@ import backend.ArticleClassifier;
 import backend.ArticleClass;
 import org.apache.solr.common.SolrDocumentList;
 import java.util.Iterator;
+import java.nio.file.Paths;
 
 @Controller
 public class ResultCardsController {
@@ -42,10 +43,19 @@ public class ResultCardsController {
   private static ArticleClassifier _ArticleClassifier = null;
   private static final String _ArticleClassesPath = "classes/id_matching.csv";
 
-  private List<Article> process(String query) throws Exception {
+  private List<Article> process(String query) throws Exception {    
     if(_ArticleClassifier == null) {
       synchronized(_ArticleLock) {
-        _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
+        try {
+          _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
+        } 
+        catch (Exception e) {
+          String what = "There was an error parsing article classes.";
+          what += "Full path is: " + Paths.get("").toAbsolutePath().toString();
+          what += ". Old exception: " + e.toString();
+          throw new Exception(what);
+        }
+        finally { }
       }
     }
 
