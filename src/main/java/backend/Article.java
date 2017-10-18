@@ -36,6 +36,7 @@ public class Article {
 	}
 	
 	public double QueryScore(QueryClass qc) {
+		if(classes == null) return 0;
 		double score = 0;
 		Iterator<ArticleClass> it = classes.iterator();
 		while(it.hasNext()) {
