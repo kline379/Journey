@@ -44,6 +44,20 @@ public class ResultCardsController {
   private static ArticleClassifier _ArticleClassifier = null;
   private static final String _ArticleClassesPath = "classes/id_matching.csv";
 
+  void _GetAllSubdirs(String path, ArrayList<File> files) {
+    File directory = new File(path);
+
+    File[] fList = directory.listFiles();
+    for(int i = 0; i < fList.length; i++) {
+      File f = fList[i];
+      if(f.isFile()) {
+        files.add(f);
+      } else if (f.isDirectory()) {
+        _GetAllSubdirs(f.getAbsolutePath(), files);
+      }      
+    }
+  }
+
   private List<Article> process(String query) throws Exception {    
     if(_ArticleClassifier == null) {
       synchronized(_ArticleLock) {
@@ -51,20 +65,19 @@ public class ResultCardsController {
           _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
         } 
         catch (Exception e) {
-          String path = Paths.get("").toAbsolutePath().toString();
-          String what = "There was an error parsing article classes.";
-          what += "Full path is: " + path;
-          File f = new File(path, "WEB-INF");
-          String[] dirs = f.list();
-          for(int i = 0; i < dirs.length; i++) {            
-            what += "<div>";
-            what += dirs[i] + "\n";
-            what += "</div>";
+          ArrayList<File> files = new ArrayList<File>();
+          _GetAllSubdirs(Paths.get("").toAbsolutePath().toString(), files);
+          
+          String lookFor = "id_matching";
+          String dump = "";
+          for(File f : files) {
+            dump += f.getAbsolutePath().toString() + "\n";
+            if(f.toString().contains(lookFor.toLowerCase())) {
+              throw new Exception(f.getAbsolutePath().toString());
+            }
           }
-          what += "Length: " + dirs.length + "\n";
-          what += ". Old exception: " + e.toString() + "\n";
-          throw new Exception(what);
-        }
+          throw new Exception(dump);
+        } 
         finally { }
       }
     }
