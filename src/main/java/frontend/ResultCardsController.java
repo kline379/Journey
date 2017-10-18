@@ -17,6 +17,7 @@ import backend.ArticleClass;
 import org.apache.solr.common.SolrDocumentList;
 import java.util.Iterator;
 import java.nio.file.Paths;
+import java.io.File;
 
 @Controller
 public class ResultCardsController {
@@ -53,16 +54,15 @@ public class ResultCardsController {
           String path = Paths.get("").toAbsolutePath().toString();
           String what = "There was an error parsing article classes.";
           what += "Full path is: " + path;
-          what += ". Old exception: " + e.toString() + "\n";
-          String[] dirs = (new File(path)).list(new FilenameFilter() { 
-            @Override
-            public boolean accept(File current, String name) {
-              return new File(current, name).isDirectory();
-            }
-          });
-          for(int i = 0; i < dirs.length; i++) {
+          File f = new File(path, "WEB-INF");
+          String[] dirs = f.list();
+          for(int i = 0; i < dirs.length; i++) {            
+            what += "<div>";
             what += dirs[i] + "\n";
+            what += "</div>";
           }
+          what += "Length: " + dirs.length + "\n";
+          what += ". Old exception: " + e.toString() + "\n";
           throw new Exception(what);
         }
         finally { }
