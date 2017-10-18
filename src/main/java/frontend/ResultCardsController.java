@@ -50,9 +50,19 @@ public class ResultCardsController {
           _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
         } 
         catch (Exception e) {
+          String path = Paths.get("").toAbsolutePath().toString();
           String what = "There was an error parsing article classes.";
-          what += "Full path is: " + Paths.get("").toAbsolutePath().toString();
-          what += ". Old exception: " + e.toString();
+          what += "Full path is: " + path;
+          what += ". Old exception: " + e.toString() + "\n";
+          String[] dirs = (new File(path)).list(new FilenameFilter() { 
+            @Override
+            public boolean accept(File current, String name) {
+              return new File(current, name).isDirectory();
+            }
+          });
+          for(int i = 0; i < dirs.length; i++) {
+            what += dirs[i] + "\n";
+          }
           throw new Exception(what);
         }
         finally { }
