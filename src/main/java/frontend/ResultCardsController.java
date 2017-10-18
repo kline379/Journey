@@ -16,31 +16,71 @@ import backend.ArticleClassifier;
 import backend.ArticleClass;
 import org.apache.solr.common.SolrDocumentList;
 import java.util.Iterator;
+import java.nio.file.Paths;
+import java.io.File;
 
 @Controller
 public class ResultCardsController {
 
   @RequestMapping("/results")
-  public String populateCards (
-      @RequestParam(value = "searchQuery", required = true, defaultValue = "World") String query, Model model) 
-    		  throws Exception {
-
+  public String populateCards(
+    @RequestParam(value = "query", required = true, defaultValue = "World") String query,
+    @RequestParam(value = "rank", required = false, defaultValue = "unranked") String rank, 
+    Model model
+  )
+    throws Exception 
+  {
     List<Article> results = process(query);
-    // This is what is used to sort the articles
-    results = rankArticles(results, query);
-    // ----------------------------------------
+    if(rank.equals("ranked")) {
+      results = rankArticles(results, query);
+    }
+    model.addAttribute("query", query);
     model.addAttribute("results", results);
+    model.addAttribute("ranked", rank);    
     return "cards";
   }
 
   private static Object _ArticleLock = new Object();
   private static ArticleClassifier _ArticleClassifier = null;
-  private static final String _ArticleClassesPath = "src/scripts/id_matching.csv";
+  private static final String _ArticlesFile = "id_matching";
 
-  private List<Article> process(String query) throws Exception {
+  static void _GetAllSubdirs(String path, ArrayList<File> files) {
+    File directory = new File(path);
+
+    File[] fList = directory.listFiles();
+    for(int i = 0; i < fList.length; i++) {
+      File f = fList[i];
+      if(f.isFile()) {
+        files.add(f);
+      } else if (f.isDirectory()) {
+        _GetAllSubdirs(f.getAbsolutePath(), files);
+      }      
+    }
+  }
+
+  static String _GetArticlePath(String dir, String lookingFor) 
+    throws Exception
+  {
+    ArrayList<File> files = new ArrayList<File>();
+    _GetAllSubdirs(Paths.get("").toAbsolutePath().toString(), files);
+    
+    for(File f : files) {
+      String fullPath = f.getAbsolutePath().toString();
+      if(fullPath.toLowerCase().contains(lookingFor.toLowerCase())) {
+        return fullPath; 
+      }
+    }
+    throw new Exception("file: " + lookingFor + " could not be found");
+  }
+
+  private List<Article> process(String query) throws Exception {    
     if(_ArticleClassifier == null) {
       synchronized(_ArticleLock) {
-        _ArticleClassifier = ArticleClassifier.ParseClasses(_ArticleClassesPath);
+        String path = _GetArticlePath(
+          Paths.get("").toAbsolutePath().toString(),
+          _ArticlesFile
+        );
+        _ArticleClassifier = ArticleClassifier.ParseClasses(path);      
       }
     }
 
@@ -60,7 +100,7 @@ public class ResultCardsController {
 	  return cardList;
   }
   
-  private List<Article> rankArticles(List<Article> articles, String query) {    
+  private List<Article> rankArticles(List<Article> articles, String query) {   
     QueryClassifier classifier = new QueryClassifier();
     List<QueryClass> classes = classifier.GetClasses(query);   
 

@@ -13,15 +13,29 @@
             opacity: 0.95;
         }
     </style>
+    <link rel="stylesheet" type="text/css" href="/journey.css"/>
+    <script src="/wtf_wikipedia.min.js"></script>
+    <script src="parse.js"></script>
 </head>
 <body>
-
+    <div class="search-form">
+        <form action="/results" method="get">
+            <div class="search">
+                <input type="text" name="query" placeholder="Where do you want to go?" th:value="${query}"/>
+                <input type="submit" value="Hmmm..."/>
+            </div>
+            <div id="rank-buttons">
+                <input name="rank" type="radio" value ="unranked" th:checked="${ranked == 'unranked'}">Unranked</input>
+                <input name="rank" type="radio" value ="ranked" th:checked="${ranked == 'ranked'}">Ranked</input>
+            </div>
+        </form>
+    </div>
     <div th:each="card, iter: ${results}" align="center">
         <div class="card card-inverse card-primary mb-3 " style="width: 40rem; color: white;">
             <div class="card-img grad" width="25%"/>
             <div class="card-img-overlay h-100 d-flex flex-column justify-content-end text-left">
                 <h2 class="card-title"><strong th:text="${card.title}">Default</strong></h2>
-                <button type="button" class="btn btn-primary" data-toggle="modal" th:attr="data-target=${'#' + iter.index}">
+                <button type="button" class="btn btn-primary" data-toggle="modal" th:attr="data-target=${'#' + iter.index}, data-target-id=${iter.index}" onclick="parse(this); this.onclick=null">
                     Go here!
                 </button>
             </div>
@@ -34,7 +48,7 @@
                     <h4 th:text="${card.title}" class="modal-title">Destination</h4>
                     </div>
                     <div class="modal-body">
-                    <p th:text="${card.description}">Description</p>
+                    <p class="description" th:text="${card.description}">Description</p>
                     </div>
                     <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
