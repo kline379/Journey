@@ -9,17 +9,20 @@ public class Article {
 	public String title;
 	public String id;
 	public String description;
+	public String imageURL;
 	private List<ArticleClass> classes;
   
 	public Article(
 		String title, 
 		String id, 
 		String description,
+		String imageURL,
 		List<ArticleClass> classes
 	) {
 	  this.title = title;
 	  this.id = id;
 		this.description = description;
+		this.imageURL = imageURL;
 		this.classes = classes;
 	}
   

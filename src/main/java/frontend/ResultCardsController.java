@@ -7,15 +7,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.io.*;
 import backend.QueryRetriever;
 import backend.QueryClassifier;
 import backend.QueryClass;
 import backend.Article;
 import backend.ArticleClassifier;
 import backend.ArticleClass;
+import backend.ImageFetcher;
 import org.apache.solr.common.SolrDocumentList;
-import java.util.Iterator;
 import java.nio.file.Paths;
 import java.io.File;
 
@@ -88,14 +87,16 @@ public class ResultCardsController {
 	  
 	  QueryRetriever retriever = new QueryRetriever();
 	  retriever.Initialize();
-	  SolrDocumentList documents = retriever.RetrieveQueries(query);
+    SolrDocumentList documents = retriever.RetrieveQueries(query);
+    ImageFetcher imageFetcher = new ImageFetcher();
 	  for(int i = 0; i < documents.size(); i++) {
       String title = documents.get(i).getFieldValue("title").toString();
       String body = documents.get(i).getFieldValues("body").toString();
       String id = documents.get(i).getFieldValues("id").toString();
+      String imageURL = imageFetcher.getBannerURL(title);
       id = id.replace("[", "").replace("]", "");
       List<ArticleClass> acs = _ArticleClassifier.GetArticleClasses(id);
-		  cardList.add(new Article(title, id, body, acs));
+		  cardList.add(new Article(title, id, body, imageURL, acs));
 	  }	  
 	  return cardList;
   }

@@ -1,10 +1,5 @@
 package backend;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.io.*;
-
 public class ArticleClass {
 
 	private String _Class;
