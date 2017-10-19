@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title>Journey</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -18,6 +18,11 @@
     <script src="parse.js"></script>
 </head>
 <body>
+  <div class="pull-right">
+    <form th:action="@{/logout}" method="post" >
+      <input type="submit" value="Sign Out" />
+    </form>
+  </div>
     <div class="search-form">
         <form action="/results" method="get">
             <div class="search">
