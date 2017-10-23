@@ -17,17 +17,17 @@ if __name__ == '__main__':
     numEntries = int(sys.stdin.readline().rstrip())
 
     articles = Articles(file_directory)  
-    cat_classes = CategoryClass.parse('cats.csv')
-    types = articles.filter_sort_categories(cat_classes)
+    types = articles.filter_sort_categories()
 
     for k in types:        
-        types[k] = types[k][:numEntries]
+        type_map = types[k]
+        if len(type_map) > numEntries:
+            types[k] = types[k][:numEntries]
 
     training_data = ''
+    rankers = set()
     for c, v in types.items():
-        ranker = ','.join([CategoryClass.category_to_ranker(k) for \
-            k in c.classes])
-        print(ranker)
+        ranker = category_to_ranker(c)
         for dat in v:
             s = dat['sentence']
             s = s.replace('"', '""')
@@ -35,13 +35,11 @@ if __name__ == '__main__':
             nextEntry = '"' + s + '",' + ranker + '\n'
             if(len(nextEntry) < 1024):
                 training_data = training_data + nextEntry
-
-            nextEntryRanker = '"' + s + '",' + str(score_of_1000) + \
-                ',' + ranker + "\n"
-
+                rankers.add(ranker)
+                
+   
     print("Generated: " + str(len(training_data.split('\n'))) + " entries")
     print()
-
     nlc = NaturalLanguageClassifierV1(username=username_nlc,
         password=password_nlc)
 

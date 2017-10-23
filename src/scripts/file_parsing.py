@@ -13,43 +13,8 @@ def is_int(s):
     except:
         return False
 
-### CategoryClass Class
-### Contains a list of categories which make up
-### a CategoryClass. E.g. The two categories
-### 'sports' and 'health and fitness' could make
-### up a single class
-
-class CategoryClass:
-
-### Constructor
-
-    def __init__(self, categories):
-        self.classes = categories
-
-### Static initalizers to parse in the classes from
-### a csv file
-
-    @staticmethod
-    def parse(file_path):
-        classes = []
-        with open(file_path, 'r') as file:
-            for l in file.readlines():
-                l = l.strip()
-                c = CategoryClass(l.split(','))
-                classes.append(c)
-        return classes
-
-    @staticmethod
-    def category_to_ranker(category):
-        return category.replace(' ', '').replace('/', '_')
-
-### Function to determine if a category is within
-### this class
-
-    def in_class(self, category):
-        return category in self.classes
-
-### End CategoryClass
+def category_to_ranker(category):
+    return category.replace(' ', '').replace('/', '_')
 
 ### Article class
 ### Contains all the files of a single article
@@ -129,18 +94,15 @@ class Article:
         cats = self.get_file_type(Article.CATEGORIES)
         rtn = []
         for c in cats:
-            lvls = c["label"].split('/')[1:]
-            cur = ''
-            for l in lvls:
-                cur = cur + l + '/'            
-                rtn.append(cur[:-1])
+            lvl = c["label"]
+            rtn.append(lvl)
         return rtn 
 
     def category_rankings(self):
         cats = self.get_file_type(Article.CATEGORIES)
         rtn = {}
         for c in cats:
-            label = c['label'].split('/')[1:]            
+            label = c['label']      
             if len(label) > 0:
                 rtn[label[0]] = float(c['score'])
         return rtn
@@ -219,22 +181,20 @@ class Articles:
                 set_cats.add(cats[0])
         return set_cats
 
-    def filter_categories(self, classes):
+    def filter_categories(self):
         types = self.relation_types()
         by_class = { }
         for k in types:
             for rel in types[k]:
-                cat = rel['category']                
-                for c in classes:
-                    if c.in_class(cat):
-                        if c not in by_class:
-                            by_class[c] = []
-                        by_class[c].append(rel)
+                cat = rel['category']       
+                if cat not in by_class:
+                    by_class[cat] = []
+                by_class[cat].append(rel)
 
         return by_class
 
-    def filter_sort_categories(self, classes):
-        cat_class = self.filter_categories(classes)
+    def filter_sort_categories(self):
+        cat_class = self.filter_categories()
         for k in cat_class:
             cat_class[k] = sorted(cat_class[k], key=lambda x: -x['score'])
         return cat_class
