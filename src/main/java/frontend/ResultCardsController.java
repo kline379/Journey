@@ -7,13 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import backend.QueryRetriever;
-import backend.QueryClassifier;
-import backend.QueryClass;
-import backend.Article;
-import backend.ArticleClassifier;
-import backend.ArticleClass;
-import backend.ImageFetcher;
+import backend.*;
 import org.apache.solr.common.SolrDocumentList;
 import java.nio.file.Paths;
 import java.io.File;
@@ -39,33 +33,35 @@ public class ResultCardsController {
     return "cards";
   }
 
-  private static Object _ArticleLock = new Object();
-  private static ArticleClassifier _ArticleClassifier = null;
   private static final String _ArticlesFile = "id_matching";
-
-  private void _InitArticleClassifer() throws Exception {
-    if(_ArticleClassifier == null) {
-      synchronized(_ArticleLock) {
+  private static final Lazy<ArticleClassifier> _ArticleClassifier = 
+    new Lazy<ArticleClassifier>(
+      new Lazy.Init<ArticleClassifier>()
+    {
+      @Override
+      public ArticleClassifier Initialize() 
+        throws Exception
+      {
         String path = _GetArticlePath(
           Paths.get("").toAbsolutePath().toString(),
           _ArticlesFile
         );
-        _ArticleClassifier = ArticleClassifier.ParseClasses(path);      
+        ArticleClassifier c = ArticleClassifier.ParseClasses(path);
+        return c;
       }
-    }
-  }
+    });
 
-  private static Object _QueryLock = new Object();
-  private static QueryRetriever _QueryRetriver = null;
-
-  private void _InitQueryRetriever() throws Exception {
-    if(_QueryRetriver == null) {
-      synchronized(_QueryLock) {
-        _QueryRetriver = new QueryRetriever();
-        _QueryRetriver.Initialize();
+  private static final Lazy<QueryRetriever> _QueryRetriver = 
+    new Lazy<QueryRetriever>(
+      new Lazy.Init<QueryRetriever>() 
+    {
+      @Override
+      public QueryRetriever Initialize()
+        throws Exception
+      {
+        return new QueryRetriever();
       }
-    }
-  }
+    });
 
   static void _GetAllSubdirs(String path, ArrayList<File> files) {
     File directory = new File(path);
@@ -96,13 +92,11 @@ public class ResultCardsController {
     throw new Exception("file: " + lookingFor + " could not be found");
   }
 
-  private List<Article> process(String query) throws Exception {    
-    _InitArticleClassifer();
-    _InitQueryRetriever();
-
+  private List<Article> process(String query) throws Exception {  
 	  List<Article> cardList = new ArrayList<Article>();  
 
-    SolrDocumentList documents = _QueryRetriver.RetrieveQueries(query, 5);
+    SolrDocumentList documents = _QueryRetriver.get()
+      .RetrieveQueries(query, 5);
     ImageFetcher imageFetcher = new ImageFetcher();
 	  for(int i = 0; i < documents.size(); i++) {
       String title = documents.get(i).getFieldValue("title").toString();
@@ -110,7 +104,8 @@ public class ResultCardsController {
       String id = documents.get(i).getFieldValues("id").toString();
       String imageURL = imageFetcher.getBannerURL(title);
       id = id.replace("[", "").replace("]", "");
-      List<ArticleClass> acs = _ArticleClassifier.GetArticleClasses(id);
+      List<ArticleClass> acs = _ArticleClassifier.get()
+        .GetArticleClasses(id);
 		  cardList.add(new Article(title, id, body, imageURL, acs));
 	  }	  
 	  return cardList;
