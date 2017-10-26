@@ -110,6 +110,11 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.10.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.scribe</groupId>
+			<artifactId>scribe</artifactId>
+			<version>1.0.6</version>
+		</dependency>
 	</dependencies>
 
 	<build>

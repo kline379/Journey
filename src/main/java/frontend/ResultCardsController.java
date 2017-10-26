@@ -43,6 +43,30 @@ public class ResultCardsController {
   private static ArticleClassifier _ArticleClassifier = null;
   private static final String _ArticlesFile = "id_matching";
 
+  private void _InitArticleClassifer() throws Exception {
+    if(_ArticleClassifier == null) {
+      synchronized(_ArticleLock) {
+        String path = _GetArticlePath(
+          Paths.get("").toAbsolutePath().toString(),
+          _ArticlesFile
+        );
+        _ArticleClassifier = ArticleClassifier.ParseClasses(path);      
+      }
+    }
+  }
+
+  private static Object _QueryLock = new Object();
+  private static QueryRetriever _QueryRetriver = null;
+
+  private void _InitQueryRetriever() throws Exception {
+    if(_QueryRetriver == null) {
+      synchronized(_QueryLock) {
+        _QueryRetriver = new QueryRetriever();
+        _QueryRetriver.Initialize();
+      }
+    }
+  }
+
   static void _GetAllSubdirs(String path, ArrayList<File> files) {
     File directory = new File(path);
 
@@ -73,21 +97,12 @@ public class ResultCardsController {
   }
 
   private List<Article> process(String query) throws Exception {    
-    if(_ArticleClassifier == null) {
-      synchronized(_ArticleLock) {
-        String path = _GetArticlePath(
-          Paths.get("").toAbsolutePath().toString(),
-          _ArticlesFile
-        );
-        _ArticleClassifier = ArticleClassifier.ParseClasses(path);      
-      }
-    }
+    _InitArticleClassifer();
+    _InitQueryRetriever();
 
-	  List<Article> cardList = new ArrayList<Article>();
-	  
-	  QueryRetriever retriever = new QueryRetriever();
-	  retriever.Initialize();
-    SolrDocumentList documents = retriever.RetrieveQueries(query);
+	  List<Article> cardList = new ArrayList<Article>();  
+
+    SolrDocumentList documents = _QueryRetriver.RetrieveQueries(query, 5);
     ImageFetcher imageFetcher = new ImageFetcher();
 	  for(int i = 0; i < documents.size(); i++) {
       String title = documents.get(i).getFieldValue("title").toString();

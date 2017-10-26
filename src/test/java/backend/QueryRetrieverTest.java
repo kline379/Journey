@@ -43,7 +43,7 @@ public class QueryRetrieverTest {
 		when(solrClient.query(isA(String.class), isA(SolrQuery.class))).
 			thenReturn(new QueryResponse());
 				
-		queryRetriever.RetrieveQueries("");
+		queryRetriever.RetrieveQueries("", 10);
 		verify(solrClient).query(any(String.class), any(SolrQuery.class));
 	}
 }
