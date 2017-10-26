@@ -23,6 +23,11 @@ public class YelpQueryer {
     private OAuthService _Service;
     private Token _AccessToken;
 
+    public static final String ConsumerKey = "";
+    public static final String ConsumerSecret = "";
+    public static final String Token = "";
+    public static final String TokenSecret = "";
+
     public YelpQueryer(
         String consumerKey,
         String consumerSecret,

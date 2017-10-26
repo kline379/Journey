@@ -2,8 +2,7 @@ package frontend;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,6 +10,7 @@ import backend.*;
 import org.apache.solr.common.SolrDocumentList;
 import java.nio.file.Paths;
 import java.io.File;
+import com.google.gson.*;
 
 @Controller
 public class ResultCardsController {
@@ -31,6 +31,18 @@ public class ResultCardsController {
     model.addAttribute("results", results);
     model.addAttribute("ranked", rank);    
     return "cards";
+  }
+
+  @RequestMapping(
+    value = "/yelpreview", 
+    method = RequestMethod.GET,
+    produces = "application/json" 
+  )
+  public String YelpReview(
+    @RequestParam(value = "location", required = true) String location
+  ) throws Exception {
+    List<YelpBusiness> bus = _YelpRetriever.get().Query(location);
+    return new Gson().toJson(bus);
   }
 
   private static final String _ArticlesFile = "id_matching";
@@ -60,6 +72,21 @@ public class ResultCardsController {
         throws Exception
       {
         return new QueryRetriever();
+      }
+    });
+
+  private static final Lazy<YelpQueryer> _YelpRetriever = 
+    new Lazy<YelpQueryer>(
+      new Lazy.Init<YelpQueryer>()
+    {
+      @Override
+      public YelpQueryer Initialize()
+        throws Exception
+      {
+        return new YelpQueryer(
+          YelpQueryer.ConsumerKey, YelpQueryer.ConsumerSecret,
+          YelpQueryer.Token, YelpQueryer.TokenSecret
+        );
       }
     });
 
