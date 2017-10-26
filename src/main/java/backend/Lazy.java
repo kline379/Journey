@@ -16,7 +16,7 @@ public class Lazy<T> {
         _InitFunc = init;
     }
 
-    public T get() {
+    public T get() throws Exception {
         if(_Instance == null) {
             synchronized(_Lock) {
                 _Instance = _InitFunc.Initialize();
@@ -33,7 +33,7 @@ public class Lazy<T> {
         _InitFunc = init;
     }
 
-    public Lazy<T> Set() {
+    public Lazy<T> Set() throws Exception {
         _Instance = _InitFunc.Initialize();
         return this;
     }
