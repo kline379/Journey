@@ -49,17 +49,19 @@ public class YelpQueryer {
         return response.getBody();
     }
 
-    public List<YelpBusiness> Query(String location) {
+    public List<YelpBusiness> Query(String location) 
+        throws JSONException
+    {
         OAuthRequest request = createOAuthRequest(SEARCH_PATH);
-        request.addQuerystringParameter("location", location);
+        request.addOAuthParameter("location", location);
         String body = sendRequestAndGetResponse(request);
         JSONObject obj = new JSONObject(body);
-        JSONArray businesses = obj.GetJSONArray("businesses");
+        JSONArray businesses = obj.getJSONArray("businesses");
         
         List<YelpBusiness> yelpBus = new ArrayList<YelpBusiness>();
         for(int i = 0; i < businesses.length(); i++) {
             JSONObject bus = businesses.getJSONObject(i);
-            yelpBus.add(YelpBusiness.ParseJSON(bus);
+            yelpBus.add(YelpBusiness.ParseJSON(bus));
         }
 
         return yelpBus;
