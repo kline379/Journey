@@ -10,6 +10,7 @@ import backend.*;
 import org.apache.solr.common.SolrDocumentList;
 import java.nio.file.Paths;
 import java.io.File;
+import java.util.function.*;
 import com.google.gson.*;
 
 @Controller
@@ -47,47 +48,38 @@ public class ResultCardsController {
 
   private static final String _ArticlesFile = "id_matching";
   private static final Lazy<ArticleClassifier> _ArticleClassifier = 
-    new Lazy<ArticleClassifier>(
-      new Lazy.Init<ArticleClassifier>()
+    new Lazy<ArticleClassifier>(() -> 
     {
-      @Override
-      public ArticleClassifier Initialize() 
-        throws Exception
-      {
+      try {
         String path = _GetArticlePath(
           Paths.get("").toAbsolutePath().toString(),
           _ArticlesFile
         );
         ArticleClassifier c = ArticleClassifier.ParseClasses(path);
         return c;
-      }
+      } catch(Exception e) { throw new RuntimeException(e); }
     });
 
   private static final Lazy<QueryRetriever> _QueryRetriver = 
-    new Lazy<QueryRetriever>(
-      new Lazy.Init<QueryRetriever>() 
+    new Lazy<QueryRetriever>(() ->
     {
-      @Override
-      public QueryRetriever Initialize()
-        throws Exception
-      {
-        return new QueryRetriever();
-      }
+      try {
+        QueryRetriever qr = new QueryRetriever();
+        qr.Initialize();
+        return qr;
+      } catch(Exception e) { throw new RuntimeException(e); }
     });
 
   private static final Lazy<YelpQueryer> _YelpRetriever = 
-    new Lazy<YelpQueryer>(
-      new Lazy.Init<YelpQueryer>()
+    new Lazy<YelpQueryer>(() ->
     {
-      @Override
-      public YelpQueryer Initialize()
-        throws Exception
-      {
+      try {
         return new YelpQueryer(
           YelpQueryer.ConsumerKey, YelpQueryer.ConsumerSecret,
           YelpQueryer.Token, YelpQueryer.TokenSecret
         );
-      }
+      } catch(Exception e) { throw new RuntimeException(e); }
+
     });
 
   static void _GetAllSubdirs(String path, ArrayList<File> files) {

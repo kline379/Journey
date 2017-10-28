@@ -1,25 +1,21 @@
 package backend;
 
-
+import java.util.function.*;
 
 public class Lazy<T> {
 
-    public interface Init<E> {
-        public E Initialize() throws Exception;
-    }
-
-    private Init<T> _InitFunc;
+    private Supplier<T> _InitFunc;
     private Object _Lock = new Object();
     private T _Instance = null;
 
-    public Lazy(Init<T> init) {
+    public Lazy(Supplier<T> init) {
         _InitFunc = init;
     }
 
     public T get() throws Exception {
         if(_Instance == null) {
             synchronized(_Lock) {
-                _Instance = _InitFunc.Initialize();
+                _Instance = _InitFunc.get();
             }
         }
         return _Instance;
@@ -29,12 +25,12 @@ public class Lazy<T> {
         return _Instance != null;
     }
 
-    public void SetInit(Init<T> init) {
+    public void SetInit(Supplier<T> init) {
         _InitFunc = init;
     }
 
     public Lazy<T> Set() throws Exception {
-        _Instance = _InitFunc.Initialize();
+        _Instance = _InitFunc.get();
         return this;
     }
 } 
