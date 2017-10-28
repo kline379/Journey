@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 import backend.*;
-import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.*;
 import java.nio.file.Paths;
 import java.io.File;
 import java.util.function.*;
@@ -74,13 +74,15 @@ public class ResultCardsController {
     new Lazy<YelpQueryer>(() ->
     {
       try {
-        return new YelpQueryer(
-          YelpQueryer.ConsumerKey, YelpQueryer.ConsumerSecret,
-          YelpQueryer.Token, YelpQueryer.TokenSecret
-        );
+        return new YelpQueryer();
       } catch(Exception e) { throw new RuntimeException(e); }
-
     });
+
+  private static final Lazy<ImageFetcher> _ImageFetcher = 
+    new Lazy<ImageFetcher>(() ->
+    {
+      return new ImageFetcher();
+    });    
 
   static void _GetAllSubdirs(String path, ArrayList<File> files) {
     File directory = new File(path);
@@ -111,21 +113,25 @@ public class ResultCardsController {
     throw new Exception("file: " + lookingFor + " could not be found");
   }
 
+  private static Article _GetArticle(SolrDocument doc)
+    throws Exception
+  {
+    String title = doc.getFieldValue("title").toString();
+    String body = doc.getFieldValues("body").toString();
+    String id = doc.getFieldValues("id").toString();
+    String imageURL = _ImageFetcher.get().getBannerURL(title);
+    id = id.replace("[", "").replace("]", "");
+    List<ArticleClass> acs = _ArticleClassifier.get()
+      .GetArticleClasses(id);
+    return new Article(title, id, body, imageURL, acs);
+  }
+
   private List<Article> process(String query) throws Exception {  
 	  List<Article> cardList = new ArrayList<Article>();  
-
     SolrDocumentList documents = _QueryRetriver.get()
       .RetrieveQueries(query, 5);
-    ImageFetcher imageFetcher = new ImageFetcher();
 	  for(int i = 0; i < documents.size(); i++) {
-      String title = documents.get(i).getFieldValue("title").toString();
-      String body = documents.get(i).getFieldValues("body").toString();
-      String id = documents.get(i).getFieldValues("id").toString();
-      String imageURL = imageFetcher.getBannerURL(title);
-      id = id.replace("[", "").replace("]", "");
-      List<ArticleClass> acs = _ArticleClassifier.get()
-        .GetArticleClasses(id);
-		  cardList.add(new Article(title, id, body, imageURL, acs));
+      cardList.add(_GetArticle(documents.get(i)));
 	  }	  
 	  return cardList;
   }
