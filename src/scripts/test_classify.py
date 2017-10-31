@@ -77,7 +77,7 @@ if __name__ == '__main__':
     '''
 
     articles = Articles(file_directory)
-    cat_classes = CategoryClass.parse('cats.csv')
+    #cat_classes = CategoryClass.parse('cats.csv')
 
     while True:
         print("Write query: ")
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         for r in rslt:
             print("Number {}: {}".format(i, r['title']))
             i = i + 1
-        
+'''
         print("After ranking\n\n")
         rslt = sorted(rslt, key=get_sort_func(articles, cat_classes))
         i = 0
@@ -107,3 +107,4 @@ if __name__ == '__main__':
 
         #ranker_id = get_ranker_id(rankers, top_class)
         #rank_rslt = rar.rank(ranker_id, "I want to go to the beach")
+'''

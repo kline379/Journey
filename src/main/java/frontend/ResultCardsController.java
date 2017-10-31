@@ -2,21 +2,16 @@ package frontend;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import backend.QueryRetriever;
-import backend.QueryClassifier;
-import backend.QueryClass;
-import backend.Article;
-import backend.ArticleClassifier;
-import backend.ArticleClass;
-import backend.ImageFetcher;
-import org.apache.solr.common.SolrDocumentList;
+import backend.*;
+import org.apache.solr.common.*;
 import java.nio.file.Paths;
 import java.io.File;
+import java.util.function.*;
+import com.google.gson.*;
 
 @Controller
 public class ResultCardsController {
@@ -39,9 +34,55 @@ public class ResultCardsController {
     return "cards";
   }
 
-  private static Object _ArticleLock = new Object();
-  private static ArticleClassifier _ArticleClassifier = null;
+  @RequestMapping(
+    value = "/yelpreview", 
+    method = RequestMethod.GET,
+    produces = "application/json" 
+  )
+  public String YelpReview(
+    @RequestParam(value = "location", required = true) String location
+  ) throws Exception {
+    List<YelpBusiness> bus = _YelpRetriever.get().Query(location);
+    return new Gson().toJson(bus);
+  }
+
   private static final String _ArticlesFile = "id_matching";
+  private static final Lazy<ArticleClassifier> _ArticleClassifier = 
+    new Lazy<ArticleClassifier>(() -> 
+    {
+      try {
+        String path = _GetArticlePath(
+          Paths.get("").toAbsolutePath().toString(),
+          _ArticlesFile
+        );
+        ArticleClassifier c = ArticleClassifier.ParseClasses(path);
+        return c;
+      } catch(Exception e) { throw new RuntimeException(e); }
+    });
+
+  private static final Lazy<QueryRetriever> _QueryRetriver = 
+    new Lazy<QueryRetriever>(() ->
+    {
+      try {
+        QueryRetriever qr = new QueryRetriever();
+        qr.Initialize();
+        return qr;
+      } catch(Exception e) { throw new RuntimeException(e); }
+    });
+
+  private static final Lazy<YelpQueryer> _YelpRetriever = 
+    new Lazy<YelpQueryer>(() ->
+    {
+      try {
+        return new YelpQueryer();
+      } catch(Exception e) { throw new RuntimeException(e); }
+    });
+
+  private static final Lazy<ImageFetcher> _ImageFetcher = 
+    new Lazy<ImageFetcher>(() ->
+    {
+      return new ImageFetcher();
+    });    
 
   static void _GetAllSubdirs(String path, ArrayList<File> files) {
     File directory = new File(path);
@@ -72,31 +113,25 @@ public class ResultCardsController {
     throw new Exception("file: " + lookingFor + " could not be found");
   }
 
-  private List<Article> process(String query) throws Exception {    
-    if(_ArticleClassifier == null) {
-      synchronized(_ArticleLock) {
-        String path = _GetArticlePath(
-          Paths.get("").toAbsolutePath().toString(),
-          _ArticlesFile
-        );
-        _ArticleClassifier = ArticleClassifier.ParseClasses(path);      
-      }
-    }
+  private static Article _GetArticle(SolrDocument doc)
+    throws Exception
+  {
+    String title = doc.getFieldValue("title").toString();
+    String body = doc.getFieldValues("body").toString();
+    String id = doc.getFieldValues("id").toString();
+    String imageURL = _ImageFetcher.get().getBannerURL(title);
+    id = id.replace("[", "").replace("]", "");
+    List<ArticleClass> acs = _ArticleClassifier.get()
+      .GetArticleClasses(id);
+    return new Article(title, id, body, imageURL, acs);
+  }
 
-	  List<Article> cardList = new ArrayList<Article>();
-	  
-	  QueryRetriever retriever = new QueryRetriever();
-	  retriever.Initialize();
-    SolrDocumentList documents = retriever.RetrieveQueries(query);
-    ImageFetcher imageFetcher = new ImageFetcher();
+  private List<Article> process(String query) throws Exception {  
+	  List<Article> cardList = new ArrayList<Article>();  
+    SolrDocumentList documents = _QueryRetriver.get()
+      .RetrieveQueries(query, 5);
 	  for(int i = 0; i < documents.size(); i++) {
-      String title = documents.get(i).getFieldValue("title").toString();
-      String body = documents.get(i).getFieldValues("body").toString();
-      String id = documents.get(i).getFieldValues("id").toString();
-      String imageURL = imageFetcher.getBannerURL(title);
-      id = id.replace("[", "").replace("]", "");
-      List<ArticleClass> acs = _ArticleClassifier.GetArticleClasses(id);
-		  cardList.add(new Article(title, id, body, imageURL, acs));
+      cardList.add(_GetArticle(documents.get(i)));
 	  }	  
 	  return cardList;
   }

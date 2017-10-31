@@ -52,11 +52,12 @@ public class QueryRetriever
 		return new HttpSolrClient(this.service.getSolrUrl(cluster.getId()),
 				HttpSolrClientUtils.createHttpClient(this.endPoint, this.USERNAME, this.PASSWORD));
 	}
-	
-	public SolrDocumentList RetrieveQueries(String query) 
+
+	public SolrDocumentList RetrieveQueries(String query, int count) 
 		throws InterruptedException, SolrServerException, IOException
 	{
-    	SolrQuery solrQuery = new SolrQuery(query);
+		SolrQuery solrQuery = new SolrQuery(query);
+		solrQuery.setTermsLimit(count);
     	QueryResponse response = this.solrClient.query("Wiki_Travel2", solrQuery);
     	
     	return response.getResults();

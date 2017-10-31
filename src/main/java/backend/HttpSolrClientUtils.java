@@ -39,8 +39,7 @@ import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.RetrieveAndRank;
 /**
  * Utility class to create a {@link HttpSolrClient}
  */
-public class HttpSolrClientUtils {
-  
+public class HttpSolrClientUtils {  
   
   private static class PreemptiveAuthInterceptor implements HttpRequestInterceptor {
     public void process(HttpRequest request, HttpContext context) throws HttpException {
@@ -77,10 +76,11 @@ public class HttpSolrClientUtils {
     credentialsProvider.setCredentials(new AuthScope(scopeUri.getHost(), scopeUri.getPort()),
         new UsernamePasswordCredentials(username, password));
 
-    HttpClientBuilder builder =
-        HttpClientBuilder.create().setMaxConnTotal(128).setMaxConnPerRoute(32)
-            .setDefaultRequestConfig(
-                RequestConfig.copy(RequestConfig.DEFAULT).setRedirectsEnabled(true).build())
+    HttpClientBuilder builder = HttpClientBuilder.create()        
+        .setMaxConnTotal(128)
+        .setMaxConnPerRoute(32)
+        .setDefaultRequestConfig(
+            RequestConfig.copy(RequestConfig.DEFAULT).setRedirectsEnabled(true).build())
         .setDefaultCredentialsProvider(credentialsProvider)
         .addInterceptorFirst(new PreemptiveAuthInterceptor());
     
