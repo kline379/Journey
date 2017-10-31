@@ -67,7 +67,7 @@ class Article:
 
 ### Constructor
 
-    def __init__(self, path):
+    def __init__(self, path, bad_ids):
         pathes = [join(path, f) for f in listdir(path) if '.json' in f]
         self.files = {}
         for f in pathes:
@@ -82,6 +82,7 @@ class Article:
                 file_names.append(k)
 
         self.valid = Article.valid_article(file_names) and self.id > 0
+        self.valid = self.valid and self.id no in bad_ids
 
 ### End Constructor
 
@@ -120,7 +121,9 @@ class Articles:
 
 ### Constructor
 
-    def __init__(self, path, par=True):
+    def __init__(self, path, par=True, bad_ids=[]):
+        self.bad_ids = bad_ids
+
         pathes = [join(path, f) for f in listdir(path) if isdir(join(path, f))]
         if par:
             cpu_ct = mp.cpu_count()
@@ -129,7 +132,7 @@ class Articles:
             pool.terminate()
             
         else:
-            self.articles = [Article(a) for a in pathes]
+            self.articles = [Article(a, self.bad_ids) for a in pathes]
             
         self.articles = [a for a in self.articles if a.valid]
 
