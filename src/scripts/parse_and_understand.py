@@ -11,6 +11,7 @@ import sys
 from time import sleep
 from json2html import *
 from watson_developer_cloud import RetrieveAndRankV1
+from file_parsing import *
 
 def parse_docs(el):
     id = el.find('id').text
@@ -80,14 +81,17 @@ def add_doc(client, doc):
         return False
 
 
-base_path = R"K:\OneDrive\CSE 5914\Python Scripts"
+base_path = "files"
+#base_path = R"K:\OneDrive\CSE 5914\Python Scripts"
 xmlPath = R"wikitravel-en-20090302.xml"
 
 output_path = "files"
-bad_ids_path = string.format("%s/%s", output_path, "bad_ids.csv")
+bad_id_paths = ["more_bad_ids.csv", "even_more_bad_ids.csv", "bad_ids.csv"]
 
-username_nlu = "0d758ea1-3d20-42f1-8140-75233955f6e5"
-password_nlu = "Eozo4ibLtjVF"
+username_nlu = "09f60c6f-b415-4d21-8f05-dc2d2d89ac2b"
+password_nlu = "KtdrR5BMGLg7"
+#username_nlu = "0d758ea1-3d20-42f1-8140-75233955f6e5"
+#password_nlu = "Eozo4ibLtjVF"
 
 username_rar = "638bd9ff-2179-469b-93ad-7ca894776fdd"
 password_rar = "8slDdIXgCKjd"
@@ -96,50 +100,66 @@ if __name__ == "__main__":
     xmlPath = os.path.join(base_path, xmlPath)
     docs = parse_travel(xmlPath)
 
-    nlu = NaturalLanguageUnderstandingV1(
-        username=username_nlu, password=password_nlu,
-        version="2017-02-27")
-
-    bad_ids = []
-    with open(bad_ids_path, 'rb') as csv:
-        dat = csv.readlines()
-        lines = dat.spilt('\n')
-        for l in lines:
-            ids = l.spilt(',')
-            bad_ids.append(ids)           
-
-    ct = 0
-    for doc in docs:
-        body = doc["body"]
-        d_id = doc["id"]
-        if "#REDIRECT" in body or d_id in bad_ids:
-            continue
-
-        sys.stdout.flush()
-        process_el(doc, output_path)        
-        id = doc["id"]   
-        try:       
-            ct = ct  + 1    
-            save_understanding(output_path, id, body, nlu)   
-            #succ = add_doc(client, doc)         
-            if ct % 1000:
-                sleep(10)
-                nlu = NaturalLanguageUnderstandingV1(
-                    username=username_nlu, password=password_nlu,
-                    version="2017-02-27")
-                #rar = RetrieveAndRankV1(
-                #    username=username_rar, password=password_rar)
-                #client = rar.get_pysolr_client(cluster_id, "Wiki_Travel2")
-            else:
-                sleep(0.1)
-            #if succ: print("Pass," + id)
-            #else: print("Fail," + id)
-        except:
-            print("Fail," + id)
+    #nlu = NaturalLanguageUnderstandingV1(
+    #    username=username_nlu, password=password_nlu,
+    #    version="2017-02-27")
 
     rar = RetrieveAndRankV1(
         username=username_rar, password=password_rar) 
     cluster_id = rar.list_solr_clusters()["clusters"][0]["solr_cluster_id"]
-    client = rar.get_pysolr_client(cluster_id, "Wiki_Travel2")
+    client = rar.get_pysolr_client(cluster_id, "WikiTravel_3")
 
+    bad_ids = []
+    for p in bad_id_paths:
+        with open(p, 'r') as f:
+            lines = f.readlines()
+            for l in lines:
+                ids = l.split(',')
+                for i in ids:
+                    bad_ids.append(i)      
 
+    ct = 0
+    articles = Articles('files/', bad_ids=bad_ids)
+
+    for doc in docs:
+        body = doc["body"]
+        d_id = doc["id"]
+        
+        if d_id in bad_ids:
+            #print("Id %s is in bad_ids" % d_id)
+            continue
+        elif "#REDIRECT" in body:
+            #print("Id %s has redirect" % d_id)
+            continue
+        elif articles.has_valid_article_by_id(d_id):
+            x = 5
+            #print("Id %s valid" % d_id)
+            #continue
+        else:
+            #print("Id %s needs understanding" % d_id)
+            continue
+        
+        sys.stdout.flush()
+        #process_el(doc, output_path)  
+        try:       
+            ct = ct  + 1    
+            #save_understanding(output_path, d_id, body, nlu)   
+            succ = add_doc(client, doc)         
+            if ct % 1000:
+                sleep(10)
+                #nlu = NaturalLanguageUnderstandingV1(
+                #    username=username_nlu, password=password_nlu,
+                #    version="2017-02-27")
+                rar = RetrieveAndRankV1(
+                    username=username_rar, password=password_rar)
+                client = rar.get_pysolr_client(cluster_id, "WikiTravel_3")
+            else:
+                sleep(0.1)
+            #print("\tId %s got nlu lookup" % d_id)
+            if succ: print("Pass," + d_id)
+            else: print("Failed," + d_id)
+        except Exception as e:
+            print("Exception,%s,%s" % (d_id, e))
+        except:
+            x = 5
+            print("Exception,%s,%s" % (d_id, sys.exc_info()[0]))
