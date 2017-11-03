@@ -58,7 +58,7 @@ public class QueryRetriever
 	{
 		SolrQuery solrQuery = new SolrQuery(query);
 		solrQuery.setTermsLimit(count);
-    	QueryResponse response = this.solrClient.query("Wiki_Travel2", solrQuery);
+    	QueryResponse response = this.solrClient.query("WikiTravel_3", solrQuery);
     	
     	return response.getResults();
     }
