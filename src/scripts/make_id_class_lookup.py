@@ -25,10 +25,11 @@ if __name__ == '__main__':
         for c in cats:
             c_splits = c['label'].split('/')
             if len(c_splits) >= 1:
-                cat = CategoryClass.category_to_ranker(c_splits[1])
-                al = ArticleLookup(a.id, cat, c['score'])
-                lookups.append(al)
+                for c in range(1, len(c_splits)):
+                    cat = category_to_ranker(c_splits[1])
+                    al = ArticleLookup(a.id, cat, c['score'])
+                    lookups.append(al)
 
-    with open('id_matching.csv', 'w') as file:
+    with open('id_matching2.csv', 'w') as file:
         for l in lookups:
             file.write(l.to_string() + '\n')
