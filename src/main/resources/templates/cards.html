@@ -44,7 +44,9 @@
             </div>
             <div class="card-img-overlay h-100 d-flex flex-column justify-content-end text-left">
                 <h2 class="card-title"><strong th:text="${card.title}">Default</strong></h2>
-                <button type="button" class="btn btn-primary" data-toggle="modal" th:attr="data-target=${'#' + iter.index}, data-target-id=${iter.index}" onclick="parse(this); this.onclick=null; addYelp(this)">
+                <button type="button" class="btn btn-primary" data-toggle="modal" 
+                  th:attr="data-target=${'#' + iter.index}, data-target-id=${iter.index}, title=${card.title}"
+                  onclick="parse(this); this.onclick=null; addYelp(this);">
                     Go here!
                 </button>
             </div>
@@ -54,14 +56,22 @@
                 <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <h4 th:text="${card.title}" class="modal-title">Destination</h4>
+                        <h4 th:text="${card.title}" class="modal-title">Destination</h4>
                     </div>
                     <div class="modal-body">
-                    <p class="description" th:text="${card.description}">Description</p>
-                    <a class="flights-link" th:href="${'https://www.google.com/search?q=flights+to+' + {card.title}}" target="_blank">Flights to the destination</a>
+                        <p class="description" th:text="${card.description}">Description</p>
+                        <a class="flights-link" th:href="${'https://www.google.com/search?q=flights+to+' + {card.title}}" target="_blank">Flights to the destination</a>
+                    </div>
+                    <div>
+                        <table th:attr="id=${'list' + iter.index}">
+                            <tr>
+                                <th>Name</th>
+                                <th>Rating</th>
+                            </tr>
+                        </table>
                     </div>
                     <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
                 </div>
