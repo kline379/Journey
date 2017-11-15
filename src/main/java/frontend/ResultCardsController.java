@@ -36,7 +36,7 @@ public class ResultCardsController {
 
   @RequestMapping(
     value = "/yelpreview", 
-    method = RequestMethod.GET,
+    method = RequestMethod.POST,
     produces = "application/json" 
   )
   public String YelpReview(
