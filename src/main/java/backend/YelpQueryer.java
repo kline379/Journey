@@ -42,10 +42,7 @@ public class YelpQueryer {
             InputStream inputStr = con.getInputStream();
             String encoding = con.getContentEncoding() == null ? "UTF-8" :
                 con.getContentEncoding();
-            String response = IOUtils.toString(inputStr, encoding);
-
-            System.out.println(response);
-            
+            String response = IOUtils.toString(inputStr, encoding);            
             JSONObject obj = new JSONObject(response);
             JSONArray businesses = obj.getJSONArray("businesses");
 
