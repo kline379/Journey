@@ -36,14 +36,21 @@ public class ResultCardsController {
 
   @RequestMapping(
     value = "/yelpreview", 
-    method = RequestMethod.GET,
+    method = RequestMethod.POST,
     produces = "application/json" 
   )
-  public String YelpReview(
+  public @ResponseBody String YelpReview(
     @RequestParam(value = "location", required = true) String location
-  ) throws Exception {
-    List<YelpBusiness> bus = _YelpRetriever.get().Query(location);
-    return new Gson().toJson(bus);
+  ) throws Exception {            
+    try {
+      List<YelpBusiness> bus = _YelpRetriever.get().Query(location);
+      bus.sort((YelpBusiness lhs, YelpBusiness rhs) -> 
+        Double.compare(rhs.Rating(), lhs.Rating()));
+                        
+      return new Gson().toJson(bus);      
+    } catch (Exception e) {            
+      return "[]";                                                                  
+    }
   }
 
   private static final String _ArticlesFile = "id_matching";

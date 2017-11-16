@@ -67,7 +67,10 @@ class Article:
 
 ### Constructor
 
-    def __init__(self, path):
+    def __init__(self, input):
+        path = input[0]
+        bad_ids = input[1]
+
         pathes = [join(path, f) for f in listdir(path) if '.json' in f]
         self.files = {}
         for f in pathes:
@@ -82,6 +85,7 @@ class Article:
                 file_names.append(k)
 
         self.valid = Article.valid_article(file_names) and self.id > 0
+        self.valid = self.valid and str(self.id) not in bad_ids
 
 ### End Constructor
 
@@ -120,17 +124,20 @@ class Articles:
 
 ### Constructor
 
-    def __init__(self, path, par=True):
-        pathes = [join(path, f) for f in listdir(path) if isdir(join(path, f))]
+    def __init__(self, path, par=True, bad_ids=[]):
+        self.bad_ids = bad_ids
+
+        inputs = [(join(path, f), bad_ids) \
+                  for f in listdir(path) if isdir(join(path, f))]
         if par:
             cpu_ct = mp.cpu_count()
             pool = mp.Pool(cpu_ct)
-            self.articles = pool.map(Article, pathes)
+            self.articles = pool.map(Article, inputs)
             pool.terminate()
             
         else:
-            self.articles = [Article(a) for a in pathes]
-            
+            self.articles = [Article(a) for a in inputs]
+        self.articles.reverse()
         self.articles = [a for a in self.articles if a.valid]
 
 ### End Constructor
@@ -198,6 +205,12 @@ class Articles:
         for k in cat_class:
             cat_class[k] = sorted(cat_class[k], key=lambda x: -x['score'])
         return cat_class
+
+    def has_valid_article_by_id(self, a_id):
+        for a in self.articles:
+            if str(a.id) == a_id and a.valid:
+                return True
+        return False
 
     def get_article_by_id(self, id):
         for a in self.articles:

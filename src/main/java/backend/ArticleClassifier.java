@@ -12,7 +12,6 @@ public class ArticleClassifier {
 	private ArticleClassifier(Map<String, List<ArticleClass>> mapping) 
 	{
 		_ArticleClasses = mapping;
-
 	}
 	
 	public static ArticleClassifier ParseClasses(String path)
