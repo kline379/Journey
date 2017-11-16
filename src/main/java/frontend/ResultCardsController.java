@@ -24,6 +24,7 @@ public class ResultCardsController {
   )
     throws Exception 
   {
+    System.out.println("Ranked: " + rank);
     List<Article> results = process(query);
     if(rank.equals("ranked")) {
       results = rankArticles(results, query);
