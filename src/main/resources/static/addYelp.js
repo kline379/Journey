@@ -10,43 +10,51 @@ function addYelp(element) {
 			el = document.getElementById("list" + id);
 			console.log(result.length)
 
-			if(result.length > 0) {
-				var header = document.createElement("h3");
-				header.textContent = "Restaurants";
-				el.appendChild(header);
+			if (result.length > 0) {
+				var headerElement = document.createElement('li');
 
+				var nameElement = document.createElement('span');
+				nameElement.textContent = 'Name';
+				nameElement.className = 'restaurant-header';
 
-				var row = document.createElement("tr");
-				
-				var nameH = document.createElement("th");
-				nameH.textContent = "Name";
+				var ratingElement = document.createElement('span');
+				ratingElement.textContent = 'Rating';
+				ratingElement.className = 'rating-header';
 
-				var ratingH = document.createElement("th");
-				ratingH.textContent = "Rating";
+				headerElement.appendChild(nameElement);
+				headerElement.appendChild(ratingElement);
+				headerElement.className = 'list-group-item';
 
-				row.appendChild(nameH);
-				row.appendChild(ratingH);
-
-				el.appendChild(row);
+				el.appendChild(headerElement);
+			}
+			else {
+				var headerElement = document.createElement('li');
+				headerElement.textContent = "Sorry, we couldn't find any restaurants nearby!";
+				headerElement.className = 'list-group-item';
+				el.appendChild(headerElement);
 			}
 
 			for(var i = 0; i < result.length; i++) {
-				r = result[i];
-				var toadd = document.createElement('tr');
+				var r = result[i];
 
-				var name = document.createElement('td');
-				var anc = document.createElement('a');
-				anc.textContent = r["_Name"];
-				anc.setAttribute("href", r["_Link"]);
-				anc.setAttribute("target", "_blank");
-				name.appendChild(anc);
-				toadd.appendChild(name);
+				var nameElement = document.createElement('span');
+				nameElement.className = 'restaurant';
+				var linkElement = document.createElement('a')
+				linkElement.textContent = r['_Name'];
+				linkElement.href = r['_Link'];
+				linkElement.target = '_blank';
+				nameElement.appendChild(linkElement);
 
-				var rating = document.createElement('td');
-				rating.textContent = r["_Rating"];
-				toadd.appendChild(rating);		
+				var ratingElement = document.createElement('span')
+				ratingElement.className = 'rating';
+				ratingElement.textContent = r['_Rating'];
 
-				el.appendChild(toadd);
+				var listElement = document.createElement('li');
+				listElement.className = 'list-group-item';
+				listElement.appendChild(nameElement);
+				listElement.appendChild(ratingElement);
+
+				el.appendChild(listElement);
 			}
 		}, 
 		error: function (result) {

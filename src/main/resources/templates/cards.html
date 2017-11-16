@@ -60,11 +60,22 @@
                     </div>
                     <div class="modal-body">
                         <p class="description" th:text="${card.description}">Description</p>
+
+                        <div class="panel-group">
+                            <div class="panel panel-default">
+                              <div class="panel-heading">
+                                <h4 class="panel-title">
+                                  <a data-toggle="collapse" th:attr="href=${'#collapse' + iter.index}">Nearby Restaurants</a>
+                                </h4>
+                              </div>
+                              <div th:attr="id=${'collapse' + iter.index}" class="panel-collapse collapse">
+                                <ul th:attr="id=${'list' + iter.index}" class="list-group">
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+
                         <a class="flights-link" th:href="${'https://www.google.com/search?q=flights+to+' + {card.title}}" target="_blank">Flights to the destination</a>
-                    </div>
-                    <div>
-                        <table th:attr="id=${'list' + iter.index}">                            
-                        </table>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
