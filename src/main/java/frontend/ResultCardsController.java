@@ -24,7 +24,6 @@ public class ResultCardsController {
   )
     throws Exception 
   {
-    System.out.println("Ranked: " + rank);
     List<Article> results = process(query);
     if(rank.equals("ranked")) {
       results = rankArticles(results, query);
@@ -137,9 +136,11 @@ public class ResultCardsController {
   private List<Article> process(String query) throws Exception {  
 	  List<Article> cardList = new ArrayList<Article>();  
     SolrDocumentList documents = _QueryRetriver.get()
-      .RetrieveQueries(query, 5);
+      .RetrieveQueries(query, 10);
 	  for(int i = 0; i < documents.size(); i++) {
-      cardList.add(_GetArticle(documents.get(i)));
+      Article a = _GetArticle(documents.get(i));
+      if(!a.getTitle().toLowerCase().contains("disambiguation"))
+        cardList.add(a);
 	  }	  
 	  return cardList;
   }
