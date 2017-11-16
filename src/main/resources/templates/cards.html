@@ -63,11 +63,7 @@
                         <a class="flights-link" th:href="${'https://www.google.com/search?q=flights+to+' + {card.title}}" target="_blank">Flights to the destination</a>
                     </div>
                     <div>
-                        <table th:attr="id=${'list' + iter.index}">
-                            <tr>
-                                <th>Name</th>
-                                <th>Rating</th>
-                            </tr>
+                        <table th:attr="id=${'list' + iter.index}">                            
                         </table>
                     </div>
                     <div class="modal-footer">

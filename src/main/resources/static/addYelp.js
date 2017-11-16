@@ -6,7 +6,30 @@ function addYelp(element) {
 		url: "yelpreview?" + $.param({ location: title }),
         dataType: "json",
 		success: function (result) {
+
 			el = document.getElementById("list" + id);
+			console.log(result.length)
+
+			if(result.length > 0) {
+				var header = document.createElement("h3");
+				header.textContent = "Restaurants";
+				el.appendChild(header);
+
+
+				var row = document.createElement("tr");
+				
+				var nameH = document.createElement("th");
+				nameH.textContent = "Name";
+
+				var ratingH = document.createElement("th");
+				ratingH.textContent = "Rating";
+
+				row.appendChild(nameH);
+				row.appendChild(ratingH);
+
+				el.appendChild(row);
+			}
+
 			for(var i = 0; i < result.length; i++) {
 				r = result[i];
 				var toadd = document.createElement('tr');
@@ -21,13 +44,8 @@ function addYelp(element) {
 
 				var rating = document.createElement('td');
 				rating.textContent = r["_Rating"];
-				toadd.appendChild(rating);			
+				toadd.appendChild(rating);		
 
-				/*
-				var phone = document.createElement('td');
-				phone.textContent = r["_Phone"];
-				toadd.appendChild(phone);	
-				*/
 				el.appendChild(toadd);
 			}
 		}, 

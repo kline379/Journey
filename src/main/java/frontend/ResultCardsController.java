@@ -47,8 +47,8 @@ public class ResultCardsController {
       bus.sort((YelpBusiness lhs, YelpBusiness rhs) -> 
         Double.compare(rhs.Rating(), lhs.Rating()));
                         
-      return new Gson().toJson(bus);
-    } catch (Exception e) {
+      return new Gson().toJson(bus);      
+    } catch (Exception e) {            
       return "[]";                                                                  
     }
   }
