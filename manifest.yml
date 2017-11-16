@@ -1,6 +1,6 @@
   applications:
   - name: Journey
     random-route: false
-    memory: 256M
+    memory: 1G
     path: target/journey-0.1.1-SNAPSHOT.war
     buildpack: java_buildpack
