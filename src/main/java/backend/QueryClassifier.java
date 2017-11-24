@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.lang.String;
+import java.util.stream.*;
 import java.io.*;
 import com.ibm.watson.developer_cloud.natural_language_classifier.v1.NaturalLanguageClassifier;
 import com.ibm.watson.developer_cloud.natural_language_classifier.v1.model.Classifier;
@@ -17,24 +18,23 @@ public class QueryClassifier {
     private NaturalLanguageClassifier _Service = new NaturalLanguageClassifier();
     private String _Classifier;
 
-    private List<String> GetClassifierIds() {
-        List<Classifier> classifiers = _Service.getClassifiers()
+    private List<Classifier> GetClassifierIds() {
+        return _Service.getClassifiers()
             .execute()
             .getClassifiers(); 
-        List<String> ids = new ArrayList<String>();
-        for (Classifier c : classifiers) {
-            ids.add(c.getId());
-        }
-        return ids;
     }
 
     public QueryClassifier() {
         _Service.setUsernameAndPassword(_NLCUsername, _NLCPassword);   
-        List<String> ids = GetClassifierIds();
-        _Classifier = ids.get(0);
+        List<Classifier> classifiers = GetClassifierIds();
+        _Classifier = classifiers.stream()
+            .filter(c -> c.getName().equals("full_class"))
+            .distinct().findFirst().get().getId();
     }
 
-    public List<QueryClass> GetClasses(String query) {
+    public List<QueryClass> GetClasses(String query)
+        throws Exception
+    {
         ArrayList<QueryClass> classes = new ArrayList<QueryClass>();
 
         if(_Classifier == null) 
