@@ -37,6 +37,16 @@ public class Article {
 	public String getDescription() {
 	  return this.description;
 	}
+
+	public int classSize()
+	{
+		return classes.size();
+	}
+
+	public ArticleClass getClass(int index)
+	{
+		return classes.get(index);
+	}
 	
 	public double QueryScore(QueryClass qc) {
 		if(classes == null) return 0;

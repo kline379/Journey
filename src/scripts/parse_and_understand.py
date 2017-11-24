@@ -86,7 +86,10 @@ base_path = "files"
 xmlPath = R"wikitravel-en-20090302.xml"
 
 output_path = "files"
-bad_id_paths = ["more_bad_ids.csv", "even_more_bad_ids.csv", "bad_ids.csv"]
+bad_id_paths = [
+    "more_bad_ids.csv", "even_more_bad_ids.csv", 
+    "bad_ids.csv", "final_bad_ids.csv"
+]
 
 username_nlu = "09f60c6f-b415-4d21-8f05-dc2d2d89ac2b"
 password_nlu = "KtdrR5BMGLg7"
@@ -107,7 +110,7 @@ if __name__ == "__main__":
     rar = RetrieveAndRankV1(
         username=username_rar, password=password_rar) 
     cluster_id = rar.list_solr_clusters()["clusters"][0]["solr_cluster_id"]
-    client = rar.get_pysolr_client(cluster_id, "WikiTravel_3")
+    client = rar.get_pysolr_client(cluster_id, "WikiTravel_4")
 
     bad_ids = []
     for p in bad_id_paths:

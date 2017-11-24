@@ -5,21 +5,67 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.*;
 
-public class QueryClass {
+public class QueryClass {    
 
-    public QueryClass(String className, double score) {
-        _Classes = Arrays.asList(className.split(","));
+    public class QueryContribution
+    {
+        private String _Class;
+        private double _Contribution;
+    
+        public QueryContribution(String queryClass, double contribution) {
+            _Class = queryClass;
+            _Contribution = contribution;
+        }
+    
+        public String Class()
+        {
+            return _Class;
+        }
+    
+        public double Contribution()
+        {
+            return _Contribution;
+        }
+    }
+
+    private double _GetValue(int index) 
+        throws Exception
+    {
+        if(index <= 0) throw new Exception("Index must be >= 1");
+        return 0.125 * Math.exp(-0.693 * index);
+    }
+
+    private double _GetNormalization(int count)
+        throws Exception
+    {
+        double sum = 0;
+        for(int i = 0; i < count; i++)
+        {
+            sum += _GetValue(i + 1);
+        }
+        return sum;
+    }
+
+    public QueryClass(String className, double score) 
+        throws Exception
+    {
+        List<String> splits = Arrays.asList(className.split("_"));
+        double norm = _GetNormalization(splits.size());
+        _Classes = new ArrayList<QueryContribution>();
+        for(int i = 0; i < splits.size(); i++)
+        {
+            String t = splits.get(i);
+            double cont = _GetValue(i + 1);          
+            _Classes.add(new QueryContribution(t, cont / norm));
+        }
+
         _RawClass = className;
         _Score = score;
     }
 
     private String _RawClass;
-    private List<String> _Classes;
+    private List<QueryContribution> _Classes;
     private double _Score;
-
-    public List<String> Classes() {
-        return _Classes;
-    }
 
     public String RawClass() {
         return _RawClass;
@@ -29,11 +75,20 @@ public class QueryClass {
         return _Score;
     }
 
+    public int ClassSize() {
+        return _Classes.size();
+    }
+
+    public String GetClass(int index)
+    {
+        return _Classes.get(index).Class();
+    }
+
     public boolean InQuery(String category) {
-        Iterator<String> it = _Classes.iterator();
+        Iterator<QueryContribution> it = _Classes.iterator();
         while(it.hasNext()) {
-            String next = it.next();
-            if(next.equals(category)) return true;
+            QueryContribution next = it.next();
+            if(next.Class().equals(category)) return true;
         }      
         return false;
     }
