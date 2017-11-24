@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import backend.*;
 import org.apache.solr.common.*;
 import java.nio.file.Paths;
@@ -91,6 +93,19 @@ public class ResultCardsController {
       return new ImageFetcher();
     });    
 
+  private static final Lazy<Logger> _Logger =
+    new Lazy<Logger>(() ->
+    {
+      try{
+        String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm").format(new Date());
+        return new Logger(timeStamp + ".txt");
+      } catch(Exception e)
+      {
+        System.out.println("An error occured when creating logger");
+        return null;
+      }
+    });
+
   static void _GetAllSubdirs(String path, ArrayList<File> files) {
     File directory = new File(path);
 
@@ -141,7 +156,10 @@ public class ResultCardsController {
       Article a = _GetArticle(documents.get(i));
       if(!a.getTitle().toLowerCase().contains("disambiguation"))
         cardList.add(a);
-	  }	  
+    }	  
+    LoggerSession sess = _Logger.get().getSession();
+    sess.AddLog(String.format("Retrieved query %s with %d size", query, documents.size()));
+    _Logger.get().Write(sess);
 	  return cardList;
   }
   
