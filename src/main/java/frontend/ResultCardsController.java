@@ -136,7 +136,7 @@ public class ResultCardsController {
   private List<Article> process(String query) throws Exception {  
 	  List<Article> cardList = new ArrayList<Article>();  
     SolrDocumentList documents = _QueryRetriver.get()
-      .RetrieveQueries(query, 10);
+      .RetrieveQueries(query, 15);
 	  for(int i = 0; i < documents.size(); i++) {
       Article a = _GetArticle(documents.get(i));
       if(!a.getTitle().toLowerCase().contains("disambiguation"))
