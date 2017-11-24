@@ -26,13 +26,17 @@ public class ResultCardsController {
   )
     throws Exception 
   {
+    LoggerSession sess = _Logger.get().getSession();
+
     List<Article> results = process(query);
     if(rank.equals("ranked")) {
-      results = rankArticles(results, query);
+      results = rankArticles(results, query, sess);
     }
     model.addAttribute("query", query);
     model.addAttribute("results", results);
     model.addAttribute("ranked", rank);    
+
+    _Logger.get().Write(sess);
     return "cards";
   }
 
@@ -55,7 +59,7 @@ public class ResultCardsController {
     }
   }
 
-  private static final String _ArticlesFile = "id_matching";
+  private static final String _ArticlesFile = "id_matching2";
   private static final Lazy<ArticleClassifier> _ArticleClassifier = 
     new Lazy<ArticleClassifier>(() -> 
     {
@@ -157,20 +161,30 @@ public class ResultCardsController {
       if(!a.getTitle().toLowerCase().contains("disambiguation"))
         cardList.add(a);
     }	  
-    LoggerSession sess = _Logger.get().getSession();
-    sess.AddLog(String.format("Retrieved query %s with %d size", query, documents.size()));
-    _Logger.get().Write(sess);
 	  return cardList;
   }
   
-  private List<Article> rankArticles(List<Article> articles, String query) {   
+  private List<Article> rankArticles(List<Article> articles, String query, LoggerSession ses) {   
     QueryClassifier classifier = new QueryClassifier();
     List<QueryClass> classes = classifier.GetClasses(query);   
 
     Comparator<QueryClass> qcC = new QueryClass.QcCompartor();
     classes.sort(qcC);
-
     QueryClass topClass = classes.get(0);
+
+    ses.AddLog(String.format("Query classified top class: %s", topClass.RawClass()));
+    for(int i = 0; i < articles.size(); i++)
+    {
+      String log = String.format("Article Id: %s, has classes: ", articles.get(i).getId());
+      for(int j = 0; j < articles.get(i).classSize(); j++)
+      {
+        String c = articles.get(i).getClass(j).Class();
+        if(j == 0) log += c;
+        else log += "," + c;
+      }
+      ses.AddLog(log);
+    }
+
     Comparator<Article> comp = new Article.ArticleComparator(topClass);
     articles.sort(comp);
 
