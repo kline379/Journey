@@ -51,12 +51,9 @@ public class Article {
 	public double QueryScore(QueryClass qc) {
 		if(classes == null) return 0;
 		double score = 0;
-		Iterator<ArticleClass> it = classes.iterator();
-		while(it.hasNext()) {
-				ArticleClass next = it.next();
-				String category = next.Class();
-				if(qc.InQuery(category)) 					
-					score += next.Confidence();
+		for(ArticleClass ac : classes)
+		{
+			score += qc.Score(ac);
 		}
 		return score;
 	}
