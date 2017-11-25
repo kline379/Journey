@@ -46,6 +46,10 @@ public class QueryClass {
         return sum;
     }
 
+    private String _RawClass;
+    private List<QueryContribution> _Classes;
+    private double _Confidence;
+
     public QueryClass(String className, double score) 
         throws Exception
     {
@@ -60,19 +64,12 @@ public class QueryClass {
         }
 
         _RawClass = className;
-        _Score = score;
+        _Confidence = score;
     }
 
-    private String _RawClass;
-    private List<QueryContribution> _Classes;
-    private double _Score;
 
     public String RawClass() {
         return _RawClass;
-    }
-
-    public double Score() {
-        return _Score;
     }
 
     public int ClassSize() {
@@ -84,13 +81,17 @@ public class QueryClass {
         return _Classes.get(index).Class();
     }
 
-    public boolean InQuery(String category) {
-        Iterator<QueryContribution> it = _Classes.iterator();
-        while(it.hasNext()) {
-            QueryContribution next = it.next();
-            if(next.Class().equals(category)) return true;
-        }      
-        return false;
+    public double Score(ArticleClass articleClass)
+    {
+        double score = 0;
+        for(QueryContribution cont : _Classes)
+        {
+            if(cont.Class().equals(articleClass.Class()))
+            {
+                score += cont.Contribution() * _Confidence * articleClass.Confidence();
+            }
+        }
+        return score;
     }
 
     public static final class QcCompartor 
@@ -99,7 +100,7 @@ public class QueryClass {
         public QcCompartor() { }
         @Override
         public int compare(QueryClass lhs, QueryClass rhs) {
-            return -Double.compare(lhs._Score, rhs._Score);
+            return -Double.compare(lhs._Confidence, rhs._Confidence);
         }
     }
 }
