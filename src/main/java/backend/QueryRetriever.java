@@ -56,7 +56,7 @@ public class QueryRetriever
 	{
 		SolrQuery solrQuery = new SolrQuery(query);
 		solrQuery.setRows(count);
-    	QueryResponse response = this.solrClient.query("WikiTravel_3", solrQuery);
+    	QueryResponse response = this.solrClient.query("WikiTravel_5", solrQuery);
 		return response.getResults();
     }
 }
