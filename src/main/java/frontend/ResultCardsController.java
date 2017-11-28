@@ -21,9 +21,10 @@ public class ResultCardsController {
   private static final Lazy<Logger> _Logger =
   new Lazy<Logger>(() ->
   {
-    try{
-      String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm").format(new Date());
-      return new Logger(timeStamp + ".txt");
+    try{      
+      //String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm").format(new Date());
+      //return new Logger(timeStamp + ".txt");
+      return new Logger("LogFile.txt");
     } catch(Exception e)
     {
       System.out.println("An error occured when creating logger");

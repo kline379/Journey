@@ -9,12 +9,15 @@ import java.io.Writer;
 
 public class Logger
 {
-	private PrintWriter _Out;
+	private File _File;
+	private PrintWriter _Out;	
 	private Object _Lock = new Object();
 
 	public Logger(String path) throws IOException
 	{ 
-		FileWriter fw = new FileWriter(path, true);
+		_File = new File(path);
+		_File.createNewFile();
+		FileWriter fw = new FileWriter(_File, true);
 		BufferedWriter bw = new BufferedWriter(fw);
 		_Out = new PrintWriter(bw);
 	}
@@ -29,10 +32,23 @@ public class Logger
 		return new LoggerSession();
 	}
 
-	public void Write(LoggerSession session)
+	private void _CheckSize() throws IOException
+	{
+		if(_File.length() > 1e6)
+		{
+			_File.delete();
+			_File.createNewFile();
+			FileWriter fw = new FileWriter(_File, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			_Out = new PrintWriter(bw);
+		}
+	}
+
+	public void Write(LoggerSession session) throws IOException
 	{
 		synchronized(_Lock)
 		{
+			_CheckSize();
 			for(int i = 0; i < session.size(); i++)
 			{
 				_Out.println(session.getLog(i));
