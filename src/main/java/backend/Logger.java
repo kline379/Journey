@@ -16,7 +16,10 @@ public class Logger
 	public Logger(String path) throws IOException
 	{ 
 		_File = new File(path);
-		_File.createNewFile();
+		if(!_File.exists())
+		{
+			_File.createNewFile();
+		}
 		FileWriter fw = new FileWriter(_File, true);
 		BufferedWriter bw = new BufferedWriter(fw);
 		_Out = new PrintWriter(bw);
