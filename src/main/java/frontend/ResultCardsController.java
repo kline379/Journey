@@ -205,5 +205,5 @@ public class ResultCardsController {
     articles.sort(comp);
 
     return articles;
-  }
+  } 
 }
