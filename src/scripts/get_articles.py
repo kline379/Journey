@@ -33,7 +33,7 @@ def process_el(doc, dir):
     text = doc["body"]
 
     with codecs.open(os.path.join(dir, id + ".json"), 'w', 'utf-8') as file:
-        file.write(json.dumps(doc))
+        file.write(json.dumps(doc, indent=2))
 
 xmlPath = R"wikitravel-en-20090302.xml"
 

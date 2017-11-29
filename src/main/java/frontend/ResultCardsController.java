@@ -46,7 +46,11 @@ public class ResultCardsController {
     if(rank.equals("ranked")) {
       results = rankArticles(results, query, sess);
     }
-    results = results.subList(0, 9);
+    if(results.size() > 10)
+    {
+      results = results.subList(0, 9);
+      
+    }
     model.addAttribute("query", query);
     model.addAttribute("results", results);
     model.addAttribute("ranked", rank);    
@@ -175,26 +179,27 @@ public class ResultCardsController {
     Comparator<QueryClass> qcC = new QueryClass.QcCompartor();
     classes.sort(qcC);
     QueryClass topClass = classes.get(0);
-    
-    String log = "Classes from top for query " + query + " are:";
-    for(int i = 0; i < topClass.ClassSize(); i++)
-    {
-      if(i != 0) log += ",";
-      log += topClass.GetClass(i);
-    }
-    ses.AddLog(log);
-
-    for(int i = 0; i < articles.size(); i++)
-    {
-      log = String.format("Article Id: %s, has classes: ", articles.get(i).getId());
-      for(int j = 0; j < articles.get(i).classSize(); j++)
+    try {
+      String log = "Classes from top for query " + query + " are:";
+      for(int i = 0; i < topClass.ClassSize(); i++)
       {
-        String c = articles.get(i).getClass(j).Class();
-        if(j == 0) log += c;
-        else log += "," + c;
+        if(i != 0) log += ",";
+        log += topClass.GetClass(i);
       }
       ses.AddLog(log);
-    }
+
+      for(int i = 0; i < articles.size(); i++)
+      {
+        log = String.format("Article Id: %s, has classes: ", articles.get(i).getId());
+        for(int j = 0; j < articles.get(i).classSize(); j++)
+        {
+          String c = articles.get(i).getClass(j).Class();
+          if(j == 0) log += c;
+          else log += "," + c;
+        }
+        ses.AddLog(log);
+      }
+    } catch (Exception e) { }
 
     Comparator<Article> comp = new Article.ArticleComparator(topClass);
     articles.sort(comp);
