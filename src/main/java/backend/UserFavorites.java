@@ -55,37 +55,6 @@ public class UserFavorites {
         throw new Exception(user + ": No such entry");
       }
 
-<<<<<<< HEAD
-  //   try {
-  //     // See if the banner is already in the database
-  //     GetItemSpec spec = new GetItemSpec().withPrimaryKey("email", title);
-  //     Item outcome = this.bannerTable.getItem(spec);
-  //     if (outcome == null) {
-  //       // Throw an Exception if it's not
-  //       throw new Exception(title+ ": No such entry");
-  //     }
-  //     return outcome.get("url").toString();
-  //   }
-  //   catch (Exception e) {
-  //     // The banner was not in the database
-  //     System.err.println("Unable to read item");
-  //     System.err.println(e.getMessage());
-  //     // Scrape it from WikiTravel
-  //     String imageURL = scrapeImageURL(title);
-  //     try {
-  //       // Write the scraped banner url to the database
-  //       Item item = new Item()
-  //         .withPrimaryKey("title", title)
-  //         .withString("url", imageURL);
-  //       this.bannerTable.putItem(item);
-  //     }
-  //     catch (Exception nestedE) {
-  //       System.err.println("Error writing (" + title + "," + imageURL + ") to table");
-  //       System.err.println(nestedE.getMessage());
-  //     }
-  //     return imageURL;
-  //   }
-=======
       for (BigDecimal number : outcome.getNumberSet("favorites")) {
         ids.add(number.intValue());
       }
@@ -95,6 +64,5 @@ public class UserFavorites {
     } finally {
       return ids;
     }
->>>>>>> 3232e8f325a1ea389385aa5dd93aa5eb2e5bcf3f
   }
 }

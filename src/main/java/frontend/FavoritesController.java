@@ -16,7 +16,6 @@ public class FavoritesController {
   public String currentUserName(Principal principal, Model model)
     throws Exception
   {
-
     List<Integer> ids = UserFavorites.getFavorites(principal.getName());
     List<String> ids_str = ids.stream().map(i -> i.toString())
       .collect(Collectors.toList());
