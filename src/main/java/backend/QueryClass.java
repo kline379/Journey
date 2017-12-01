@@ -53,7 +53,8 @@ public class QueryClass {
     public QueryClass(String className, double score) 
         throws Exception
     {
-        List<String> splits = Arrays.asList(className.split("_"));
+        List<String> splits = Arrays.asList(
+          className.substring(1).split("_"));
         double norm = _GetNormalization(splits.size());
         _Classes = new ArrayList<QueryContribution>();
         for(int i = 0; i < splits.size(); i++)

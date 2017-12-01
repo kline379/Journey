@@ -7,6 +7,9 @@ import com.sun.tools.javah.resources.l10n;
 import java.io.*;
 import java.io.Writer;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 public class Logger
 {
 	private File _File;
@@ -49,10 +52,17 @@ public class Logger
 		synchronized(_Lock)
 		{
 			_CheckSize();
+			_Out.println("***********************");
+			String timeStamp = new SimpleDateFormat("yyyy_MM_dd_HH_mm").format(new Date());
+			_Out.println("Log at time: " + timeStamp);
+			_Out.println("***********************");
 			for(int i = 0; i < session.size(); i++)
 			{
 				_Out.println(session.getLog(i));
 			}
+			_Out.println("***********************");
+			_Out.println("End log");
+			_Out.println("***********************");
 			_Out.flush();
 		}
 	}
