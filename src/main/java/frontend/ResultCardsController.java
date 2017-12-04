@@ -12,50 +12,58 @@ import java.nio.file.Paths;
 import java.io.File;
 import java.util.function.*;
 import com.google.gson.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Controller
 public class ResultCardsController {
 
+  @RequestMapping("/fave")
+  public String populateCards(@RequestParam(value = "article") String id){
+    return null;
+  }
+
   @RequestMapping("/results")
   public String populateCards(
     @RequestParam(value = "query", required = true, defaultValue = "World") String query,
-    @RequestParam(value = "rank", required = false, defaultValue = "unranked") String rank, 
+    @RequestParam(value = "rank", required = false, defaultValue = "unranked") String rank,
     Model model
   )
-    throws Exception 
+    throws Exception
   {
+    String name = SecurityContextHolder.getContext().getAuthentication().getName();
     List<Article> results = process(query);
     if(rank.equals("ranked")) {
       results = rankArticles(results, query);
     }
     model.addAttribute("query", query);
     model.addAttribute("results", results);
-    model.addAttribute("ranked", rank);    
+    model.addAttribute("ranked", rank);
+    model.addAttribute("username", name);
     return "cards";
   }
 
   @RequestMapping(
-    value = "/yelpreview", 
+    value = "/yelpreview",
     method = RequestMethod.POST,
-    produces = "application/json" 
+    produces = "application/json"
   )
   public @ResponseBody String YelpReview(
     @RequestParam(value = "location", required = true) String location
-  ) throws Exception {            
+  ) throws Exception {
     try {
       List<YelpBusiness> bus = _YelpRetriever.get().Query(location);
-      bus.sort((YelpBusiness lhs, YelpBusiness rhs) -> 
+      bus.sort((YelpBusiness lhs, YelpBusiness rhs) ->
         Double.compare(rhs.Rating(), lhs.Rating()));
-                        
-      return new Gson().toJson(bus);      
-    } catch (Exception e) {            
-      return "[]";                                                                  
+
+      return new Gson().toJson(bus);
+    } catch (Exception e) {
+      return "[]";
     }
   }
 
   private static final String _ArticlesFile = "id_matching";
-  private static final Lazy<ArticleClassifier> _ArticleClassifier = 
-    new Lazy<ArticleClassifier>(() -> 
+  private static final Lazy<ArticleClassifier> _ArticleClassifier =
+    new Lazy<ArticleClassifier>(() ->
     {
       try {
         String path = _GetArticlePath(
@@ -67,7 +75,7 @@ public class ResultCardsController {
       } catch(Exception e) { throw new RuntimeException(e); }
     });
 
-  private static final Lazy<QueryRetriever> _QueryRetriver = 
+  private static final Lazy<QueryRetriever> _QueryRetriver =
     new Lazy<QueryRetriever>(() ->
     {
       try {
@@ -77,7 +85,7 @@ public class ResultCardsController {
       } catch(Exception e) { throw new RuntimeException(e); }
     });
 
-  private static final Lazy<YelpQueryer> _YelpRetriever = 
+  private static final Lazy<YelpQueryer> _YelpRetriever =
     new Lazy<YelpQueryer>(() ->
     {
       try {
@@ -85,11 +93,11 @@ public class ResultCardsController {
       } catch(Exception e) { throw new RuntimeException(e); }
     });
 
-  private static final Lazy<ImageFetcher> _ImageFetcher = 
+  private static final Lazy<ImageFetcher> _ImageFetcher =
     new Lazy<ImageFetcher>(() ->
     {
       return new ImageFetcher();
-    });    
+    });
 
   static void _GetAllSubdirs(String path, ArrayList<File> files) {
     File directory = new File(path);
@@ -101,20 +109,20 @@ public class ResultCardsController {
         files.add(f);
       } else if (f.isDirectory()) {
         _GetAllSubdirs(f.getAbsolutePath(), files);
-      }      
+      }
     }
   }
 
-  static String _GetArticlePath(String dir, String lookingFor) 
+  static String _GetArticlePath(String dir, String lookingFor)
     throws Exception
   {
     ArrayList<File> files = new ArrayList<File>();
     _GetAllSubdirs(Paths.get("").toAbsolutePath().toString(), files);
-    
+
     for(File f : files) {
       String fullPath = f.getAbsolutePath().toString();
       if(fullPath.toLowerCase().contains(lookingFor.toLowerCase())) {
-        return fullPath; 
+        return fullPath;
       }
     }
     throw new Exception("file: " + lookingFor + " could not be found");
@@ -133,21 +141,21 @@ public class ResultCardsController {
     return new Article(title, id, body, imageURL, acs);
   }
 
-  private List<Article> process(String query) throws Exception {  
-	  List<Article> cardList = new ArrayList<Article>();  
+  private List<Article> process(String query) throws Exception {
+	  List<Article> cardList = new ArrayList<Article>();
     SolrDocumentList documents = _QueryRetriver.get()
       .RetrieveQueries(query, 10);
 	  for(int i = 0; i < documents.size(); i++) {
       Article a = _GetArticle(documents.get(i));
       if(!a.getTitle().toLowerCase().contains("disambiguation"))
         cardList.add(a);
-	  }	  
+	  }
 	  return cardList;
   }
-  
-  private List<Article> rankArticles(List<Article> articles, String query) {   
+
+  private List<Article> rankArticles(List<Article> articles, String query) {
     QueryClassifier classifier = new QueryClassifier();
-    List<QueryClass> classes = classifier.GetClasses(query);   
+    List<QueryClass> classes = classifier.GetClasses(query);
 
     Comparator<QueryClass> qcC = new QueryClass.QcCompartor();
     classes.sort(qcC);

@@ -10,11 +10,12 @@ public class Article {
 	public String id;
 	public String description;
 	public String imageURL;
+	public String fave;
 	private List<ArticleClass> classes;
-  
+
 	public Article(
-		String title, 
-		String id, 
+		String title,
+		String id,
 		String description,
 		String imageURL,
 		List<ArticleClass> classes
@@ -25,19 +26,19 @@ public class Article {
 		this.imageURL = imageURL;
 		this.classes = classes;
 	}
-  
+
 	public String getTitle() {
 	  return this.title;
 	}
-  
+
 	public String getId() {
 	  return this.id;
 	}
-  
+
 	public String getDescription() {
 	  return this.description;
 	}
-	
+
 	public double QueryScore(QueryClass qc) {
 		if(classes == null) return 0;
 		double score = 0;
@@ -45,16 +46,24 @@ public class Article {
 		while(it.hasNext()) {
 				ArticleClass next = it.next();
 				String category = next.Class();
-				if(qc.InQuery(category)) 					
+				if(qc.InQuery(category))
 					score += next.Confidence();
 		}
 		return score;
 	}
 
-	public static final class ArticleComparator 
-		implements Comparator<Article> 
+	public void toggleFave(){
+		if(this.fave.equals("true")){
+			this.fave = "false";
+		} else {
+			this.fave = "true";
+		}
+	}
+
+	public static final class ArticleComparator
+		implements Comparator<Article>
 	{
-		
+
 		private QueryClass _Class;
 
 		public ArticleComparator(QueryClass qc) {
