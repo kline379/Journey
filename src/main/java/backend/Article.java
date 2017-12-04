@@ -25,6 +25,11 @@ public class Article {
 		this.description = description;
 		this.imageURL = imageURL;
 		this.classes = classes;
+		this.fave = "false";
+	}
+
+	public String getFave(){
+		return this.fave;
 	}
 
 	public String getTitle() {
@@ -59,12 +64,8 @@ public class Article {
 		return score;
 	}
 
-	public void toggleFave(){
-		if(this.fave.equals("true")){
-			this.fave = "false";
-		} else {
-			this.fave = "true";
-		}
+	public void makeFave(){
+		this.fave = "true";
 	}
 
 	public static final class ArticleComparator

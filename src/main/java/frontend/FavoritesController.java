@@ -19,7 +19,10 @@ public class FavoritesController {
     List<Integer> ids = UserFavorites.getFavorites(principal.getName());
     List<String> ids_str = ids.stream().map(i -> i.toString())
       .collect(Collectors.toList());
-    List<Article> results = APICaller.GetArticles(ids_str);    
+    List<Article> results = APICaller.GetArticles(ids_str);
+    for(int i = 0; i < results.size(); i++){
+      results.get(i).makeFave();
+    }
     model.addAttribute("results", results);
     return "cards";
   }
