@@ -43,8 +43,6 @@ public class QueryRetriever
     		cluster = this.service.getSolrCluster(cluster.getId()).execute();
     	}
     	
-    	System.out.println("Cluster is available!");
-    	
     	return cluster;
 	}
 	
@@ -57,10 +55,9 @@ public class QueryRetriever
 		throws InterruptedException, SolrServerException, IOException
 	{
 		SolrQuery solrQuery = new SolrQuery(query);
-		solrQuery.setTermsLimit(count);
-    	QueryResponse response = this.solrClient.query("WikiTravel_3", solrQuery);
-    	
-    	return response.getResults();
+		solrQuery.setRows(count);
+    	QueryResponse response = this.solrClient.query("WikiTravel_5", solrQuery);
+		return response.getResults();
     }
 }
 
