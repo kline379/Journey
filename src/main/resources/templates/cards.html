@@ -59,12 +59,12 @@
         <span><h2 class="card-title"><strong th:text="${card.title}">Default</strong>
           <span th:switch="${card.fave}">
             <form method="POST" th:action="@{/fave(article=${card.id})}" th:case="'true'" name="${card.id}" id="${card.id}" target="dummyframe" class="button-clicked">
-              <button type="submit" name="submit" value="value" id="${card.id}" class="link-button btn btn-secondary btn-sm float-right">
+              <button type="submit" name="submit" value="value" id="${card.id}" class="fave-btn link-button btn btn-secondary btn-sm float-right">
                 <img src="/icons/heart.svg" />
               </button>
             </form>
             <form method="POST" th:action="@{/fave(article=${card.id})}" th:case="*" name="${card.id}" id="${card.id}" target="dummyframe" >
-              <button type="submit" name="submit" id="${card.id}" value="value" class="link-button btn btn-secondary btn-sm float-right">
+              <button type="submit" name="submit" id="${card.id}" value="value" class="fave-btn link-button btn btn-secondary btn-sm float-right">
                 <img src="/icons/heart.svg" />
               </button>
             </form>
@@ -115,7 +115,7 @@
 
 </div>
 <script>
-$('button').on('click', function() {
+$('.fave-btn').on('click', function() {
   if(this.classList.contains('button-clicked')){
     $(this).removeClass('button-clicked');
   } else {
