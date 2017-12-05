@@ -9,50 +9,32 @@ function addYelp(element) {
 
 			el = document.getElementById("list" + id);
 			console.log(result.length)
-
-			if (result.length > 0) {
-				var headerElement = document.createElement('li');
-
-				var nameElement = document.createElement('span');
-				nameElement.textContent = 'Name';
-				nameElement.className = 'restaurant-header';
-
-				var ratingElement = document.createElement('span');
-				ratingElement.textContent = 'Rating';
-				ratingElement.className = 'rating-header';
-
-				headerElement.appendChild(nameElement);
-				headerElement.appendChild(ratingElement);
-				headerElement.className = 'list-group-item';
-
-				el.appendChild(headerElement);
-			}
-			else {
+			
+			if (result.length <= 0) {
 				var headerElement = document.createElement('li');
 				headerElement.textContent = "Sorry, we couldn't find any restaurants nearby!";
 				headerElement.className = 'list-group-item';
 				el.appendChild(headerElement);
 			}
 
-			for(var i = 0; i < result.length; i++) {
+			for (var i = 0; i < result.length; i++) {
 				var r = result[i];
 
-				var nameElement = document.createElement('span');
-				nameElement.className = 'restaurant';
-				var linkElement = document.createElement('a')
+				var listElement = document.createElement('li');
+				var linkElement = document.createElement('a');
+				var spanElement = document.createElement('span');
+
 				linkElement.textContent = r['_Name'];
+				spanElement.textContent = '(Rating: ' + r['_Rating'] + '/5)';
+
 				linkElement.href = r['_Link'];
 				linkElement.target = '_blank';
-				nameElement.appendChild(linkElement);
 
-				var ratingElement = document.createElement('span')
-				ratingElement.className = 'rating';
-				ratingElement.textContent = r['_Rating'];
+				spanElement.className = 'restaurant-rating';
 
-				var listElement = document.createElement('li');
+				listElement.appendChild(linkElement);
+				listElement.appendChild(spanElement);
 				listElement.className = 'list-group-item';
-				listElement.appendChild(nameElement);
-				listElement.appendChild(ratingElement);
 
 				el.appendChild(listElement);
 			}

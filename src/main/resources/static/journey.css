@@ -49,15 +49,6 @@ form {
     text-align: left;
 }
 
-.restaurant, .restaurant-header {
-  float: left;
-}
-
-.restaurant-header {
-  font-weight: bold;
-}
-
-.rating, .rating-header {
-  float: right;
-  font-weight: bold;
+.restaurant-rating {
+  margin-left: 10px;
 }

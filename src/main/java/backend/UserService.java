@@ -2,6 +2,8 @@ package backend;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,6 +37,18 @@ public class UserService implements UserDetailsService{
 	public UserDetails 	loadUserByUsername(String username){
 		User user = this.findUserByEmail(username);
 		return user;
+	}
+
+	public List<String> getFavorites(String username){
+		return new ArrayList<String>();
+	}
+
+	public void addFavorite(String username, String fav){
+
+	}
+
+	public void removeFavorite(String username, String fav){
+
 	}
 
 }

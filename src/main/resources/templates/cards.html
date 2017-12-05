@@ -1,93 +1,131 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-    <title>Journey</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous"/>
-    <style>
-        .grad {
-            height: 300px;
-            width: 100%;
-            background: linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%);
-            color: white;
-            opacity: 0.95;
-        }
-    </style>
-    <link rel="stylesheet" type="text/css" href="/journey.css"/>
-	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="/wtf_wikipedia.min.js"></script>
-    <script src="parse.js"></script>
-	<script src="addYelp.js"></script>
+  <title>Journey</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+  <style>
+  .grad {
+    height: 300px;
+    width: 100%;
+    background: linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%);
+    color: white;
+    opacity: 0.95;
+  }
+  .card img{
+    max-width:100%;
+  }
+  .button-clicked {
+    filter: invert(100%);
+  }
+  </style>
+  <link rel="stylesheet" type="text/css" href="/journey.css"/>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="/wtf_wikipedia.min.js"></script>
+  <script src="parse.js"></script>
+  <script src="addYelp.js"></script>
 </head>
 <body>
-  <div class="pull-right">
-    <form th:action="@{/logout}" method="post" >
-      <input type="submit" value="Sign Out" />
+  <div class="text-center">
+    <span class="float-left" style="margin: 7px;">
+      <form th:action="@{/logout}" method="post" >
+        <input type="submit" value="Sign Out" />
+      </form>
+    </span>
+    <a href="/" style="color:black;"><h1 style="display:inline-block;">Journey</h1></a>
+    <span class="float-right" style="margin: 10px;">
+      <form th:action="@{/favorites}" method="post" >
+        <input type="submit" value="Favorites" />
+      </form>
+    </span>
+  </div>
+  <div class="search-form">
+    <form action="/results" method="get">
+      <div class="search">
+        <input type="text" name="query" placeholder="Where do you want to go?" th:value="${query}"/>
+        <input type="submit" value="Hmmm..."/>
+      </div>
+      <div id="rank-buttons">
+        <input name="rank" type="checkbox" value ="ranked" th:checked="${ranked == 'ranked'}">What we think you'll like!</input>
+      </div>
     </form>
   </div>
-    <div class="search-form">
-        <form action="/results" method="get">
-            <div class="search">
-                <input type="text" name="query" placeholder="Where do you want to go?" th:value="${query}"/>
-                <input type="submit" value="Hmmm..."/>
-            </div>
-            <div id="rank-buttons">
-                <input name="rank" type="checkbox" value ="ranked" th:checked="${ranked == 'ranked'}">What we think you'll like!</input>
-            </div>
-        </form>
+  <div th:each="card, iter: ${results}" align="center">
+    <div class="card card-inverse card-primary mb-3 " style="width: 40rem; color: white;">
+      <div class="card-img grad" width="25%">
+        <img class="card-img" style="filter: brightness(50%); height: 100%;" th:attr="src=${card.imageURL}"/>
+      </div>
+      <div class="card-img-overlay h-100 d-flex flex-column justify-content-end text-left">
+        <span><h2 class="card-title"><strong th:text="${card.title}">Default</strong>
+          <span th:switch="${card.fave}">
+            <form method="POST" th:action="@{/fave(article=${card.id})}" th:case="'true'" name="${card.id}" id="${card.id}" target="dummyframe" class="button-clicked">
+              <button type="submit" name="submit" value="value" id="${card.id}" class="fave-btn link-button btn btn-secondary btn-sm float-right">
+                <img src="/icons/heart.svg" />
+              </button>
+            </form>
+            <form method="POST" th:action="@{/fave(article=${card.id})}" th:case="*" name="${card.id}" id="${card.id}" target="dummyframe" >
+              <button type="submit" name="submit" id="${card.id}" value="value" class="fave-btn link-button btn btn-secondary btn-sm float-right">
+                <img src="/icons/heart.svg" />
+              </button>
+            </form>
+
+
+          </span>
+        </h2></span>
+        <button type="button" class="btn btn-primary" data-toggle="modal"
+        th:attr="data-target=${'#' + iter.index}, data-target-id=${iter.index}, title=${card.title}"
+        onclick="parse(this); this.onclick=null; addYelp(this);">
+        Go here!
+      </button>
     </div>
-    <div th:each="card, iter: ${results}" align="center">
-        <div class="card card-inverse card-primary mb-3 " style="width: 40rem; color: white;">
-            <div class="card-img grad" width="25%">
-                <img class="card-img" style="filter: brightness(50%); height: 100%;" th:attr="src=${card.imageURL}"/>
-            </div>
-            <div class="card-img-overlay h-100 d-flex flex-column justify-content-end text-left">
-                <h2 class="card-title"><strong th:text="${card.title}">Default</strong></h2>
-                <button type="button" class="btn btn-primary" data-toggle="modal" 
-                  th:attr="data-target=${'#' + iter.index}, data-target-id=${iter.index}, title=${card.title}"
-                  onclick="parse(this); this.onclick=null; addYelp(this);">
-                    Go here!
-                </button>
-            </div>
+  </div>
+
+  <div th:attr="id=${iter.index}" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 th:text="${card.title}" class="modal-title">Destination</h4>
         </div>
+        <div class="modal-body">
+          <p class="description" th:text="${card.description}">Description</p>
 
-        <div th:attr="id=${iter.index}" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 th:text="${card.title}" class="modal-title">Destination</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p class="description" th:text="${card.description}">Description</p>
+          <div class="panel-group">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" th:attr="href=${'#collapse' + iter.index}">Nearby Restaurants</a>
+                </h4>
+              </div>
+              <div th:attr="id=${'collapse' + iter.index}" class="panel-collapse collapse">
+                <ul th:attr="id=${'list' + iter.index}" class="list-group">
+                </ul>
+              </div>
+            </div>
+          </div>
 
-                        <div class="panel-group">
-                            <div class="panel panel-default">
-                              <div class="panel-heading">
-                                <h4 class="panel-title">
-                                  <a data-toggle="collapse" th:attr="href=${'#collapse' + iter.index}">Nearby Restaurants</a>
-                                </h4>
-                              </div>
-                              <div th:attr="id=${'collapse' + iter.index}" class="panel-collapse collapse">
-                                <ul th:attr="id=${'list' + iter.index}" class="list-group">
-                                </ul>
-                              </div>
-                            </div>
-                          </div>
-
-                        <a th:href="${'https://wikitravel.org/en/' + card.title}" target="_blank">Learn more</a><br></br>
-                        <a class="flights-link" th:href="${'https://www.google.com/search?q=flights+to+' + {card.title}}" target="_blank">Flights to the destination</a>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-                </div>
+          <a th:href="${'https://wikitravel.org/en/' + card.title}" target="_blank">Learn more</a><br></br>
+          <a class="flights-link" th:href="${'https://www.google.com/search?q=flights+to+' + {card.title}}" target="_blank">Flights to the destination</a>
         </div>
-
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+</div>
+<script>
+$('.fave-btn').on('click', function() {
+  if(this.classList.contains('button-clicked')){
+    $(this).removeClass('button-clicked');
+  } else {
+    $(this).addClass('button-clicked');
+  }
+});
+</script>
+<iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
 </body>
 </html>
