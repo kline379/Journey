@@ -112,7 +112,10 @@
       </div>
     </div>
   </div>
-
+</div>
+<div th:if="${results.empty}" style="text-align:center;">
+  <h1>Looks like there isn't anything to show.</h1>
+  <h1> ¯\_(ツ)_/¯</h1>
 </div>
 <script>
 $('.fave-btn').on('click', function() {
