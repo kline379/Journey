@@ -23,6 +23,7 @@ public class YelpQueryer {
         String request = String.format("https://%s", API_HOST);
         request += String.format("/%s", SEARCH_PATH);
         request += String.format("?location=%s", location);
+        request += "&term=restaurants";
         request += String.format("&limit=%d", 5);
         return request;
     }
